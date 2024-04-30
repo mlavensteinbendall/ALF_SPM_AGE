@@ -1,7 +1,6 @@
 import numpy as np # Numpy for numpy
 import math
 import matplotlib.pyplot as plt
-from function_upwind_size import UPW_SPM
 from tabulate import tabulate
 
 def trapezoidal_rule(fx, dx):
