@@ -10,12 +10,13 @@ from convergence_dt         import convergence_dt_plt
 from convergence_da         import convergence_da_plt
 import matplotlib.pyplot    as plt 
 from print_tab_conv         import tabulate_conv
+from function_LW            import LW_SPM
 
 # initial conditions
 Smax = 15
 Tmax = 1
 order = 2
-c = 1 # constant for mu
+c = 0 # constant for mu
 
 Ntest = 5
 
@@ -42,13 +43,25 @@ ds = np.zeros([Ntest]) # order smallest to largest
 # ds[3] = 0.02
 # ds[4] = 0.01
 
-ds[0] = 0.06
-ds[1] = 0.05
-ds[2] = 0.04
-ds[3] = 0.03
-ds[4] = 0.02
+# ds[0] = 0.008
+# ds[1] = 0.004 
+# ds[2] = 0.002
+# ds[3] = 0.001
+# ds[4] = 0.0005
 
-# dt = 0.0001 # da ten times smaller^^
+ds[0] = 0.08
+ds[1] = 0.04 
+ds[2] = 0.02
+ds[3] = 0.01
+ds[4] = 0.005
+
+# ds[0] = 0.06
+# ds[1] = 0.05
+# ds[2] = 0.04
+# ds[3] = 0.03
+# ds[4] = 0.02
+
+dt = 0.0001 # da ten times smaller^^
 
 # worked a lot better for order 2 but still not great
 # ds[0] = 0.006
@@ -57,27 +70,15 @@ ds[4] = 0.02
 # ds[3] = 0.048
 # ds[4] = 0.096
 
-
-dt = np.zeros([Ntest])
-dt[0] = 0.9 * ds[0]
-dt[1] = 0.9 * ds[1]
-dt[2] = 0.9 * ds[2]
-dt[3] = 0.9 * ds[3]
-dt[4] = 0.9 * ds[4]
+# cfl = 0.5
 
 # dt = np.zeros([Ntest])
-# dt[0] = 0.5 * ds[0]
-# dt[1] = 0.5 * ds[1]
-# dt[2] = 0.5 * ds[2]
-# dt[3] = 0.5 * ds[3]
-# dt[4] = 0.5 * ds[4]
+# dt[0] = cfl * ds[0]
+# dt[1] = cfl * ds[1]
+# dt[2] = cfl * ds[2]
+# dt[3] = cfl * ds[3]
+# dt[4] = cfl * ds[4]
 
-# dt = np.zeros([Ntest])
-# dt[0] = 0.1 * ds[0]
-# dt[1] = 0.1 * ds[1]
-# dt[2] = 0.1 * ds[2]
-# dt[3] = 0.1 * ds[3]
-# dt[4] = 0.1 * ds[4]
 
 # dt = np.zeros([ntests])
 # dt[0] = 0.006/2
@@ -96,9 +97,6 @@ for i in range(len(ds)):
     Nsize = int(Smax/ds[i]) + 1
     size = np.linspace(0,Smax, Nsize) 
 
-    #  # initalize arrays
-    # Ntime = int(Tmax/dt) + 1
-    # time = np.linspace(0,Tmax, Ntime)
 
     if isinstance(dt, np.ndarray):
         # initalize arrays
@@ -108,7 +106,8 @@ for i in range(len(ds)):
         data = np.zeros([Ntime,Nsize])
 
         print('CFL: ' + str(round(dt[i]/ds[i], 5)))
-        data = UPW_SPM(size, time, ds[i], dt[i], order, c)
+        # data = UPW_SPM(size, time, ds[i], dt[i], order, c)
+        data = LW_SPM(size, time, ds[i], dt[i], c)
 
     else:
         # initalize arrays
@@ -118,9 +117,10 @@ for i in range(len(ds)):
         data = np.zeros([Ntime,Nsize])
 
         print('CFL: ' + str(round(dt/ds[i], 5)))
-        data = UPW_SPM(size, time, ds[i], dt, order, c)
+        # data = UPW_SPM(size, time, ds[i], dt, order, c)
+        data = LW_SPM(size, time, ds[i], dt, c)
 
-    np.savetxt('ds_convergence/upwind_num_'+ str(i) +'.txt', data)  # save data to fileuu
+    np.savetxt('ds_convergence/upwind_num_'+ str(i) +'.txt', data)  # save data to file
 
     print('Loop ' + str(i) + ' Complete.') # Progress update, loop end.
 
@@ -136,8 +136,9 @@ for i in range(len(ds)):
     # Plots the numerical solution at initial, middle, and last time steps
     plot_indices = [0, Ntime // 2, Ntime - 1]  # Indices of initial, middle, and last time steps
     for t_index in plot_indices:
-        plt.plot(size, data[t_index, :], label=f'Numerical at time {round(time[t_index], 1)  }', linestyle='--')
+        # plt.plot(size, data[t_index, :], label=f'Numerical at time {round(time[t_index], 1)  }', linestyle='--')
         plt.plot(size, sol[t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='-')
+        plt.plot(size, data[t_index, :], label=f'Numerical at time {round(time[t_index], 1)  }', linestyle='--')
 
 
     plt.axhline(y=1, color='r', linestyle='--', label='y=1')
@@ -146,20 +147,22 @@ for i in range(len(ds)):
     plt.title(f'Population by Step when ds = {ds[i] }')
     plt.legend()
 
-    if isinstance(dt, np.ndarray):
-        # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('ds_plot/varied_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(round(dt[i],3)) + '_order_'+ str(order) +'.png', dpi=300)  
-    else:
-        # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('ds_plot/fixed_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
+    # # if isinstance(dt, np.ndarray):
+    # #     # Save the plot to a file -- labels with da values and dt 
+    # #     plt.savefig('ds_plot/varied_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
+    # # else:
+    # #     # Save the plot to a file -- labels with da values and dt 
+    # #     plt.savefig('ds_plot/fixed_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
 
     plt.show()
 
-# Plot the convergence of da, returns Norms and order of convergence
-# Norm = convergence_da_plt(Smax, Tmax, ds, dt, order, c)
 
-# Plot the convergence of dt
-Norm = convergence_dt_plt(Smax, Tmax, ds, dt, order, c) 
+
+# Plot the convergence xs
+if isinstance(dt, np.ndarray):
+    Norm = convergence_dt_plt(Smax, Tmax, ds, dt, order, c) 
+else:
+    Norm = convergence_da_plt(Smax, Tmax, ds, dt, order, c)
 
 
 # Checks conservation, returns norm and order of conservation

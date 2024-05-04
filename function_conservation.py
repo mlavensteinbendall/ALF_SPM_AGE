@@ -15,8 +15,7 @@ def trapezoidal_rule(fx, dx):
 
 def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
 
-    totalPop_num = np.zeros([5]) # if we are looking at only final time
-    # totalPop_num = np.zeros([len(time)]) # if we was norm1
+    totalPop_num = np.zeros([5]) 
 
     # totalPop_sol = 0 # for advection with mu = 0 it will remain the same everywhere
 
@@ -31,33 +30,24 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     else:
         totalPop_sol = -0.5 * np.pi**(0.5) * np.exp(-c * Tmax) * ( math.erf(Tmax + 5 - Smax) - math.erf(Tmax + 5) ) # solution
 
-        print('Exact: ' + str(totalPop_sol))
+        print('Exact total pop = ' + str(totalPop_sol))
 
     # Calculate the total population using trapezoidal rule
     for i in range(5):
 
         data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
+        # print(data)
 
-        # totalPop_num = np.zeros([len(data)])
+        totalPop_num[i] = trapezoidal_rule( data[-1,:],     ds[i])
 
-        totalPop_num[i] = trapezoidal_rule(data[-1,:], ds[i])
+        # print( 'ds = ' + str(ds[i]) + ' & dt = ' + str(dt[i]) + ' : total pop = ' + str(totalPop_num[i]))
+        # np.set_printoptions(precision=15)
+        # print(data[-1,119:125])
+    
 
-        print('Num: ' + str(totalPop_num[i]))
+        # Nstep = int(Smax/ds[i]) + 1   # total number of steps
 
-        # # If we want the total population at each time step
-        # for ii in range(len(data)):
-        #     totalPop_num[ii] = trapezoidal_rule(data[ii,:], ds[i])
-
-
-        Nstep = int(Smax/ds[i]) + 1   # total number of steps
-
-        # Norm1[i] = np.sum( np.abs( totalPop_num[:] - totalPop_sol ) )
         Norm1[i]    = np.abs( totalPop_num[i] - totalPop_sol )
-
-        # Norm1[i]    =  (( 1 / Nstep ) * np.sum( np.abs( totalPop_num[] - totalPop_sol ) ) )
-        # Norm1[i]    =  (( 1 / Nstep ) * np.sum( np.abs( totalPop_num[:] - totalPop_sol )**2 ) )**0.5
-
-
 
     for ii in range(0, Ntest - 1):
         L1norm[ii+1] = np.log( Norm1[ii]   / Norm1[ii+1] )   / np.log( ds[ii] / ds[ii+1] )
@@ -84,16 +74,16 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
     # Save the plot to a file -- labels with da values and dt 
-    if isinstance(dt, np.ndarray):
-        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+    # if isinstance(dt, np.ndarray):
+    #     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
-        plt.savefig('ds_plot/varied_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order) +'.png', dpi=300)  
+    #     plt.savefig('ds_plot/varied_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order) +'.png', dpi=300)  
 
-    else:
-        plt.savefig('ds_plot/fixed_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(c) + '_order_'+ str(order) +'.png', dpi=300)  
-
+    # else:
+    #     plt.savefig('ds_plot/fixed_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(c) + '_order_'+ str(order) +'.png', dpi=300)  
 
     plt.show()
+
 
     combine = [Norm1, L1norm]
 

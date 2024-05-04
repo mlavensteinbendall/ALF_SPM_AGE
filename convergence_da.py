@@ -38,7 +38,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
 
         # Solve for L-2 and L-max
         Norm2[i]    = ( ( 1 / Nage ) * np.sum( np.abs( data[n-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
-        NormMax[i]  = np.max( np.abs( data[n-1,:] - sol[:] ) )                         # L-Max error.
+        NormMax[i]  = np.max( np.abs( data[n-1,:] - sol[:] ) )                               # L-Max error.
 
 
     # Calculates the L norms -- comparing with the last (Note: ds is increasing)
@@ -67,6 +67,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
     plt.loglog(da, da**(order), label=f'order-{order }')
     # plt.loglog(da, da**1, label=f'order-{1 }')
 
+
     plt.xlabel(r'$\Delta a$')
     plt.ylabel('Norm')
     plt.title('Convergence based on ' + r'$\Delta a$')
@@ -76,7 +77,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
     ds_values_str = '_'.join(map(str, da))
 
     # Save the plot to a file -- labels with da values and dt 
-    plt.savefig('ds_plot/fixed_dt/plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }'+ '_order_' + str(order) +'.png', dpi=300)  
+    # plt.savefig('ds_plot/fixed_dt/plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }'+ '_order_' + str(order) +'.png', dpi=300)  
 
     plt.show()
 
