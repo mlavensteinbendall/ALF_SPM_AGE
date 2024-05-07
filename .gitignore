@@ -166,3 +166,5 @@ dt_convergence/
 dt_convergence/*
 ds_plot/
 ds_plot/*
+videos/
+videos/*

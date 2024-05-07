@@ -81,7 +81,7 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
     # Save the plot to a file -- labels with da values and dt 
-    # plt.savefig('ds_plot/varied_dt/plot_conv_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order)  +'.png', dpi=300)  
+    plt.savefig('ds_plot/varied_dt/plot_conv_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order)  +'.png', dpi=300)  
  
     plt.show()
 

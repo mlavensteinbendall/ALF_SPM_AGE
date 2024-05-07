@@ -11,11 +11,12 @@ from convergence_da         import convergence_da_plt
 import matplotlib.pyplot    as plt 
 from print_tab_conv         import tabulate_conv
 from function_LW            import LW_SPM
+# from function_LW_steve      import LW_SPM
 
 # initial conditions
 Smax = 15
 Tmax = 1
-order = 2
+order = 1
 c = 0 # constant for mu
 
 Ntest = 5
@@ -49,19 +50,33 @@ ds = np.zeros([Ntest]) # order smallest to largest
 # ds[3] = 0.001
 # ds[4] = 0.0005
 
-ds[0] = 0.08
-ds[1] = 0.04 
-ds[2] = 0.02
-ds[3] = 0.01
-ds[4] = 0.005
+# ds[0] = 0.08
+# ds[1] = 0.04 
+# ds[2] = 0.02
+# ds[3] = 0.01
+# ds[4] = 0.005
 
-# ds[0] = 0.06
-# ds[1] = 0.05
-# ds[2] = 0.04
-# ds[3] = 0.03
-# ds[4] = 0.02
+# ds[0] = 0.009
+# ds[1] = 0.008 
+# ds[2] = 0.007
+# ds[3] = 0.006
+# ds[4] = 0.005
 
-dt = 0.0001 # da ten times smaller^^
+ds[0] = 0.06
+ds[1] = 0.05
+ds[2] = 0.04
+ds[3] = 0.03
+ds[4] = 0.02
+
+
+# ds[0] = 0.05
+# ds[1] = 0.025
+# ds[2] = 0.020 
+# ds[3] = 0.010
+# ds[4] = 0.005
+
+
+# dt = 0.0001 # da ten times smaller^^
 
 # worked a lot better for order 2 but still not great
 # ds[0] = 0.006
@@ -70,14 +85,14 @@ dt = 0.0001 # da ten times smaller^^
 # ds[3] = 0.048
 # ds[4] = 0.096
 
-# cfl = 0.5
+cfl = 0.1
 
-# dt = np.zeros([Ntest])
-# dt[0] = cfl * ds[0]
-# dt[1] = cfl * ds[1]
-# dt[2] = cfl * ds[2]
-# dt[3] = cfl * ds[3]
-# dt[4] = cfl * ds[4]
+dt = np.zeros([Ntest])
+dt[0] = cfl * ds[0]
+dt[1] = cfl * ds[1]
+dt[2] = cfl * ds[2]
+dt[3] = cfl * ds[3]
+dt[4] = cfl * ds[4]
 
 
 # dt = np.zeros([ntests])
@@ -87,8 +102,10 @@ dt = 0.0001 # da ten times smaller^^
 # dt[3] = 0.009/2
 # dt[4] = 0.0095/2
 
+filename = 'ds_convergence/' 
 
-print('Upwind Order = ' + str(order))
+
+# print('Upwind Order = ' + str(order))
 for i in range(len(ds)):
 
     print('Entering loop ' + str(i))
@@ -108,6 +125,7 @@ for i in range(len(ds)):
         print('CFL: ' + str(round(dt[i]/ds[i], 5)))
         # data = UPW_SPM(size, time, ds[i], dt[i], order, c)
         data = LW_SPM(size, time, ds[i], dt[i], c)
+        # LW_SPM(ds[i],dt[i],i,filename)
 
     else:
         # initalize arrays
@@ -119,6 +137,7 @@ for i in range(len(ds)):
         print('CFL: ' + str(round(dt/ds[i], 5)))
         # data = UPW_SPM(size, time, ds[i], dt, order, c)
         data = LW_SPM(size, time, ds[i], dt, c)
+        # LW_SPM(ds[i],dt,i,filename)
 
     np.savetxt('ds_convergence/upwind_num_'+ str(i) +'.txt', data)  # save data to file
 
@@ -147,12 +166,12 @@ for i in range(len(ds)):
     plt.title(f'Population by Step when ds = {ds[i] }')
     plt.legend()
 
-    # # if isinstance(dt, np.ndarray):
-    # #     # Save the plot to a file -- labels with da values and dt 
-    # #     plt.savefig('ds_plot/varied_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
-    # # else:
-    # #     # Save the plot to a file -- labels with da values and dt 
-    # #     plt.savefig('ds_plot/fixed_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
+    if isinstance(dt, np.ndarray):
+        # Save the plot to a file -- labels with da values and dt 
+        plt.savefig('ds_plot/varied_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
+    else:
+        # Save the plot to a file -- labels with da values and dt 
+        plt.savefig('ds_plot/fixed_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
 
     plt.show()
 
