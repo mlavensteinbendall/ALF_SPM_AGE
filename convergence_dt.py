@@ -15,28 +15,28 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
 
     for i in range(0, Ntest):
 
-        Nage = int(Smax/ds[i])+1
-        age = np.zeros([Nage])
-        age = np.linspace(0, Smax, Nage) # Create an array of those sizes.
+        Nstep = int(Smax/ds[i])+1
+        step = np.zeros([Nstep])
+        step = np.linspace(0, Smax, Nstep) # Create an array of those sizes.
 
         n = int(Tmax/dt[i]) + 1 # Time-step of comparison.
         Tend = n*dt[i] # Get the associated timepoint value.
 
-        data = np.zeros([int(Tmax/ds[i])+1, Nage])
-        sol = np.zeros([Nage])
+        data = np.zeros([int(Tmax/ds[i])+1, Nstep])
+        sol = np.zeros([Nstep])
 
         data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
-        sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(-c * Tend)          # mu(s) = 0
+        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-c * Tend)          # mu(s) = 0
         
         # # plt data vs sol
-        # plt.plot(age,data[-1,:]) 
-        # plt.plot(age,sol) # looks right
+        # plt.plot(step,data[-1,:]) 
+        # plt.plot(step,sol) # looks right
         # plt.show()
 
         # Solve for L-2 and L-max
-        Norm2[i]    = ( ( 1 / Nage ) * np.sum( np.abs( data[n-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
+        Norm2[i]    = ( ( 1 / Nstep ) * np.sum( np.abs( data[n-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
         NormMax[i]  = np.max( np.abs( data[n-1,:] - sol[:] ) )                         # L-Max error.
 
 
