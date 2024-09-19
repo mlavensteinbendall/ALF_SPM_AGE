@@ -15,7 +15,7 @@ from function_LW            import LW_SPM
 
 # initial conditions
 Smax = 15
-Tmax = 1
+Tmax = 0.5
 order = 1
 c = 0 # constant for mu
 
@@ -75,7 +75,7 @@ ds[4] = 0.02
 # ds[3] = 0.010
 # ds[4] = 0.005
 
-
+dt = 0.5 * ds
 # dt = 0.0001 # da ten times smaller^^
 
 # worked a lot better for order 2 but still not great
@@ -87,12 +87,12 @@ ds[4] = 0.02
 
 cfl = 0.1
 
-dt = np.zeros([Ntest])
-dt[0] = cfl * ds[0]
-dt[1] = cfl * ds[1]
-dt[2] = cfl * ds[2]
-dt[3] = cfl * ds[3]
-dt[4] = cfl * ds[4]
+# dt = np.zeros([Ntest])
+# dt[0] = cfl * ds[0]
+# dt[1] = cfl * ds[1]
+# dt[2] = cfl * ds[2]
+# dt[3] = cfl * ds[3]
+# dt[4] = cfl * ds[4]
 
 
 # dt = np.zeros([ntests])
@@ -165,6 +165,8 @@ for i in range(len(ds)):
     plt.ylabel('Population')
     plt.title(f'Population by Step when ds = {ds[i] }')
     plt.legend()
+
+    print(data[-1, 99:109])
 
     if isinstance(dt, np.ndarray):
         # Save the plot to a file -- labels with da values and dt 
