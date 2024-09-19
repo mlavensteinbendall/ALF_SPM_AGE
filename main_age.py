@@ -16,7 +16,7 @@ from function_LW            import LW_SPM
 # initial conditions
 Smax = 15
 Tmax = 0.5
-order = 1
+order = 2
 c = 0 # constant for mu
 
 Ntest = 5
@@ -76,7 +76,9 @@ ds[4] = 0.02
 # ds[4] = 0.005
 
 dt = 0.5 * ds
+# dt = 0.1 * ds
 # dt = 0.0001 # da ten times smaller^^
+# dt =0.001
 
 # worked a lot better for order 2 but still not great
 # ds[0] = 0.006
@@ -95,7 +97,7 @@ cfl = 0.1
 # dt[4] = cfl * ds[4]
 
 
-# dt = np.zeros([ntests])
+# dt = np.zeros([Ntest])
 # dt[0] = 0.006/2
 # dt[1] = 0.007/2
 # dt[2] = 0.008/2
@@ -118,6 +120,7 @@ for i in range(len(ds)):
     if isinstance(dt, np.ndarray):
         # initalize arrays
         Ntime = int(Tmax/dt[i]) + 1
+        print(Ntime)
         time = np.linspace(0,Tmax, Ntime)
 
         data = np.zeros([Ntime,Nsize])
