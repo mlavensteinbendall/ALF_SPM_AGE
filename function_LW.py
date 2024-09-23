@@ -16,6 +16,8 @@ def LW_SPM(step, time, ds, dt, c):
         for i in range(len(step)):
             mu[i] = c
 
+    print("shape of mu: ", mu.shape)
+
 
     for t in range(0, len(time)-1):
 
@@ -29,21 +31,52 @@ def LW_SPM(step, time, ds, dt, c):
             second_centeral_diff = (N[t,s+1] - 2 * N[t,s] + N[t,s-1]) / ds**2
 
             Ntemp[s] = N[t,s] - (dt/2) * first_centeral_diff + (dt**2/8) * second_centeral_diff
+            # print("Ntemp = ", Ntemp[s].shape)
             # Ntemp[a] = N[t,a] - (dt/(2*ds)) * (N[t,a] - N[t,a-1]) + (dt**2/(2**3 * ds**2)) * (N[t,a] - 2 * N[t,a-1] + N[t,a-2])  
 
         # step 2 -- full time step 
-        for s in range(1,len(step)-1): 
-            Ntemp2[s] = Ntemp[s] * np.exp( - dt * mu[s] )      # exact solution 
+        for s in range(0,len(step)): 
+            # Ntemp2[s] = Ntemp[s] * np.exp( - dt * mu[s] )      # exact solution 
+
+            # RK2
+            k1 = Ntemp[s] * mu[s]         # slope at current time
+            N_star = Ntemp[s] + dt * k1     # intermediate value
+            k2 = N_star * mu[s]             # slope at intermediate value
+            Ntemp2[s] = Ntemp[s] + (dt * 0.5) * (k1 + k2)   # update value
+
 
         # step 3 -- half time step
         for s in range(1,len(step)-1):
-            # first_centeral_diff = (N[t,s+1] - N[t,s-1]) / (2*ds)                # update this to 
-            # second_centeral_diff = (N[t,s+1] - 2 * N[t,s] + N[t,s-1]) / ds**2   # update this to 
-
             first_centeral_diff  = (Ntemp2[s+1]                 - Ntemp2[s-1]) / (2*ds)  # updated 
             second_centeral_diff = (Ntemp2[s+1] - 2 * Ntemp2[s] + Ntemp2[s-1]) / ds**2   # updated 
 
             N[t+1, s] = Ntemp2[s] - (dt/2) * first_centeral_diff + (dt**2/8) * second_centeral_diff
+
+
+
+    # slightly improved
+    # for t in range(0, len(time)-1):
+
+    #     # Time Splitting
+    #     Ntemp  = np.zeros([len(step)])
+    #     Ntemp2 = np.zeros([len(step)])
+
+    #     # print("Ntemp shape = ", Ntemp.shape)
+
+    #     # step 1 -- half time step
+    #     for s in range(0,len(step)-1):
+    #         Ntemp[s] = N[t,s] * np.exp( - dt * 0.5 * mu[s] )      # exact solution 
+
+    #     # step 2 -- full time step 
+    #     for s in range(1,len(step)-1): 
+    #         first_centeral_diff  = (Ntemp[s+1]                 - Ntemp[s-1]) / (2*ds)  # updated 
+    #         second_centeral_diff = (Ntemp[s+1] - 2 * Ntemp[s] + Ntemp[s-1]) / ds**2   # updated 
+
+    #         Ntemp2[s] = Ntemp[s] - dt * first_centeral_diff + (dt**2/2) * second_centeral_diff
+
+    #     # step 3 -- half time step
+    #     for s in range(0,len(step)):
+    #         N[t+1, s] = Ntemp2[s] * np.exp( - dt * 0.5 * mu[s] )      # exact solution 
 
         # Set boundaries to zero
         N[t + 1, 0] = 0

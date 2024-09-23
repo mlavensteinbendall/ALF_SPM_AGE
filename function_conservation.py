@@ -64,25 +64,25 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     # Plot absolute error oftotal population over time
     # plt.figure(figsize=(8, 6))  # Adjust the width and height as needed
     plt.loglog(ds, Norm1, label='Norm1')
-    plt.loglog(ds, ds**(1), label=f'order-{(1) }')
+    plt.loglog(ds, ds**(order), label=f'order-{(order) }')
     plt.xlabel('ds')
     plt.ylabel('Absolute Error')
     plt.title('Error of Total Population')
     plt.legend()
 
-    # Convert ds array values to a string
-    ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
+    # # Convert ds array values to a string
+    # ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
-    # Save the plot to a file -- labels with da values and dt 
-    if isinstance(dt, np.ndarray):
-        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+    # # Save the plot to a file -- labels with da values and dt 
+    # if isinstance(dt, np.ndarray):
+    #     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
-        plt.savefig('ds_plot/varied_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order) +'.png', dpi=300)  
+    #     plt.savefig('ds_plot/varied_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order) +'.png', dpi=300)  
 
-    else:
-        plt.savefig('ds_plot/fixed_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(c) + '_order_'+ str(order) +'.png', dpi=300)  
+    # else:
+    #     plt.savefig('ds_plot/fixed_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(c) + '_order_'+ str(order) +'.png', dpi=300)  
 
-    plt.show()
+    # plt.show()
 
 
     combine = [Norm1, L1norm]
