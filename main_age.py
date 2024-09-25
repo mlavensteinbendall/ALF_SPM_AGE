@@ -1,6 +1,10 @@
 # Author: Morgan Lavenstein Bendall
 # Objective: This calls the function of our model and runs at different ds and dt.
 
+
+# Tasks:
+#   - need to change file name from upwind to lax-wendroff or something else
+
 import numpy as np
 from function_upwind_age    import UPW_SPM
 # from convergence_ds         import convergence_ds_plt
@@ -17,10 +21,11 @@ from function_LW            import LW_SPM
 Smax = 15
 Tmax = 0.5
 order = 2
-c = 0 # constant for mu
+c = 1 # constant for mu
 
 Ntest = 5
 
+# need to chose ds and dt so that the last value in the array are Smax and Tmax
 ds = np.zeros([Ntest]) # order smallest to largest
 # ds[4] = 0.1
 # ds[3] = 0.2
@@ -62,53 +67,91 @@ ds = np.zeros([Ntest]) # order smallest to largest
 # ds[3] = 0.006
 # ds[4] = 0.005
 
+
+# okay for 2nd order but not getting to 2nd order
 # ds[0] = 0.06
 # ds[1] = 0.05
 # ds[2] = 0.04
 # ds[3] = 0.03
 # ds[4] = 0.02
 
-ds[0] = 0.08
-ds[1] = 0.04 
-ds[2] = 0.02
-ds[3] = 0.01
-ds[4] = 0.005
+# ds[0] = 0.07
+# ds[1] = 0.06
+# ds[2] = 0.05
+# ds[3] = 0.04
+# ds[4] = 0.03
+
+# ds[0] = 0.5
+# ds[1] = ds[0]/2
+# ds[2] = ds[0]/3
+# ds[3] = ds[0]/4
+# ds[4] = ds[0]/5
+
+# num = 0.01
+# ds[0] = 0.06
+# ds[1] = ds[0] - num * 1
+# ds[2] = ds[0] - num * 2 
+# ds[3] = ds[0] - num * 3
+# ds[4] = ds[0] - num * 4
 
 
-# ds[0] = 0.05
-# ds[1] = 0.025
-# ds[2] = 0.020 
-# ds[3] = 0.010
+# ds[0] = 0.08
+# ds[1] = 0.04 
+# ds[2] = 0.02
+# ds[3] = 0.01
 # ds[4] = 0.005
 
+
+# makes it so size is from 0 to 15
+# ds[0] = 0.15
+# ds[1] = 0.1
+# ds[2] = 0.05
+# ds[3] = 0.03
+# ds[4] = 0.02
+
+ds[0] = 0.15
+ds[1] = 0.075
+ds[2] = 0.05
+ds[3] = 0.025
+ds[4] = 0.0125
+
+# ds[0] = 0.3
+# ds[1] = 0.15
+# ds[2] = 0.1
+# ds[3] = 0.075
+# ds[4] = 0.06
+
+# ds[0] = 0.15
+# ds[1] = 0.12
+# ds[2] = 0.06
+# ds[3] = 0.04
+# ds[4] = 0.0375
+
+# dt = 0.0001 * ds
+# dt = 0.02
+# dt = 0.00001 # da ten times smaller^^
+# dt = 0.0001 # this works for da convergence
+
+
+# dt = np.zeros([Ntest])
+# dt[0] = 2 * ds[0]
+# dt[1] = 4 * ds[1]
+# dt[2] = 6 * ds[2]
+# dt[3] = 8 * ds[3]
+# dt[4] = 10 * ds[4]
+
+
+
+# vary ds and dt cases:
+ds[0] = 0.05
+ds[1] = 0.025
+ds[2] = 0.0125
+ds[3] = 0.0625
+ds[4] = 0.003125
+
 dt = 0.5 * ds
-# dt = 0.1 * ds
-# dt = 0.0001 # da ten times smaller^^
-# dt =0.001
-
-# worked a lot better for order 2 but still not great
-# ds[0] = 0.006
-# ds[1] = 0.012
-# ds[2] = 0.024
-# ds[3] = 0.048
-# ds[4] = 0.096
-
-cfl = 0.1
-
-# dt = np.zeros([Ntest])
-# dt[0] = cfl * ds[0]
-# dt[1] = cfl * ds[1]
-# dt[2] = cfl * ds[2]
-# dt[3] = cfl * ds[3]
-# dt[4] = cfl * ds[4]
 
 
-# dt = np.zeros([Ntest])
-# dt[0] = 0.006/2
-# dt[1] = 0.007/2
-# dt[2] = 0.008/2
-# dt[3] = 0.009/2
-# dt[4] = 0.0095/2
 
 filename = 'ds_convergence/' 
 
@@ -119,15 +162,21 @@ for i in range(len(ds)):
     print('Entering loop ' + str(i))
 
     # initalize arrays
-    Nsize = int(Smax/ds[i]) + 1
-    size = np.linspace(0,Smax, Nsize) 
+    # Nsize = int(Smax/ds[i]) #+ 1
+    # size = np.linspace(0,Smax, Nsize) 
+    size = np.arange(0, Smax + ds[i], ds[i])
+    Nsize = len(size)
+    print("Size:", size[-1])
 
 
     if isinstance(dt, np.ndarray):
         # initalize arrays
-        Ntime = int(Tmax/dt[i]) + 1
-        print(Ntime)
-        time = np.linspace(0,Tmax, Ntime)
+        # Ntime = int(Tmax/dt[i]) #+ 1
+        # print(Ntime)
+        # time = np.linspace(0,Tmax, Ntime)
+        time = np.arange(0,Tmax + dt[i], dt[i])
+        Ntime = len(time)
+        print("Time:", time[-1])
 
         data = np.zeros([Ntime,Nsize])
 
@@ -138,8 +187,11 @@ for i in range(len(ds)):
 
     else:
         # initalize arrays
-        Ntime = int(Tmax/dt) + 1
-        time = np.linspace(0,Tmax, Ntime)
+        # Ntime = int(Tmax/dt) #+ 1
+        # time = np.linspace(0,Tmax, Ntime)
+        time = np.arange(0,Tmax + dt, dt)
+        Ntime = len(time)
+        print("Time:", time[-1])
 
         data = np.zeros([Ntime,Nsize])
 
@@ -200,6 +252,20 @@ conservation = conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order)
 
 # Makes latex table
 tabulate_conv(dt, ds, Norm[0], Norm[1], Norm[2], Norm[3], conservation[0], conservation[1])
+
+Norm2, L2norm, NormMax, LMaxnorm =  Norm
+Norm1, L1norm = conservation
+
+# for i in range(len(ds)):
+#     print(f"{dt[i]}, {ds[i]}, {Norm2[i]}, {L2norm[i]}, {NormMax[i]}, {LMaxnorm[i]}, {Norm1[i]}, {L1norm[i]}")
+
+for i in range(len(ds)):
+    print(f"{dt}, {ds[i]}, {Norm2[i]}, {L2norm[i]}, {NormMax[i]}, {LMaxnorm[i]}, {Norm1[i]}, {L1norm[i]}")
+
+
+
+# for i in range(len(ds)):
+#     print(f"{dt}, {ds[i]}, {Norm[0,i]}, {Norm[1,i]}, {Norm[2,i]}, {Norm[3,i]}, {conservation[0,i]}, {conservation[1,i]}")
 
 
 # Print the intial condition --------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 import numpy as np # Numpy for numpy
 import matplotlib.pyplot as plt
 
-def convergence_da_plt(step_max, time_max, da, dt, order, c):
+def convergence_da_plt(age_max, time_max, da, dt, order, c):
 
     n = int(time_max/dt) + 1 # Time-step of comparison.
     Tend = n*dt # Get the associated timepoint value.
@@ -19,17 +19,20 @@ def convergence_da_plt(step_max, time_max, da, dt, order, c):
 
     for i in range(0, Ntest):
 
-        Nstep = int(step_max/da[i])+1
-        step = np.zeros([Nstep])
-        step = np.linspace(0, step_max, Nstep) # Create an array of those sizes.
+        # Nstep = int(step_max/da[i]) + 1
+        # step = np.zeros([Nstep])
+        # step = np.linspace(0, step_max, Nstep) # Create an array of those sizes.
+        age = np.arange(0, age_max + da[i], da[i])
+        Nage = len(age)
 
-        data = np.zeros([int(time_max/da[i])+1, Nstep])
-        sol = np.zeros([Nstep])
+        data = np.zeros([int(time_max/da[i]), Nage])
+        sol = np.zeros([Nage])
 
         data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
-        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-c * Tend)          # mu(s) = 0
+        sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(-c * Tend)        
+
         
         # # plt data vs sol
         # plt.plot(step,data[-1,:]) 
@@ -37,8 +40,8 @@ def convergence_da_plt(step_max, time_max, da, dt, order, c):
         # plt.show()
 
         # Solve for L-2 and L-max
-        Norm2[i]    = ( ( 1 / Nstep ) * np.sum( np.abs( data[n-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
-        NormMax[i]  = np.max( np.abs( data[n-1,:] - sol[:] ) )                               # L-Max error.
+        Norm2[i]    = ( ( 1 / Nage ) * np.sum( np.abs( data[-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
+        NormMax[i]  = np.max( np.abs( data[-1,:] - sol[:] ) )                               # L-Max error.
 
 
     # Calculates the L norms -- comparing with the last (Note: ds is increasing)

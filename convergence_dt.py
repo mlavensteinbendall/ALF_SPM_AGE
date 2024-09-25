@@ -15,20 +15,22 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
 
     for i in range(0, Ntest):
 
-        Nstep = int(Smax/ds[i])+1
-        step = np.zeros([Nstep])
-        step = np.linspace(0, Smax, Nstep) # Create an array of those sizes.
+        # Nstep = int(Smax/ds[i]) #+1
+        # step = np.zeros([Nstep])
+        # step = np.linspace(0, Smax, Nstep) # Create an array of those sizes.
+        step = np.arange(0, Smax + ds[i], ds[i])
+        Nstep = len(step)
 
-        n = int(Tmax/dt[i]) + 1 # Time-step of comparison.
+        n = int(Tmax/dt[i]) #+ 1 # Time-step of comparison.
         Tend = n*dt[i] # Get the associated timepoint value.
 
-        data = np.zeros([int(Tmax/ds[i])+1, Nstep])
+        data = np.zeros([int(Tmax/ds[i]), Nstep])
         sol = np.zeros([Nstep])
 
         data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
-        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-c * Tend)          # mu(s) = 0
+        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-c * Tend)         
         
         # # plt data vs sol
         # plt.plot(step,data[-1,:]) 
@@ -36,8 +38,8 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
         # plt.show()
 
         # Solve for L-2 and L-max
-        Norm2[i]    = ( ( 1 / Nstep ) * np.sum( np.abs( data[n-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
-        NormMax[i]  = np.max( np.abs( data[n-1,:] - sol[:] ) )                         # L-Max error.
+        Norm2[i]    = ( ( 1 / Nstep ) * np.sum( np.abs( data[-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
+        NormMax[i]  = np.max( np.abs( data[-1,:] - sol[:] ) )                         # L-Max error.
 
 
     # Calculates the L norms -- comparing with the last (Note: ds is increasing)
@@ -64,11 +66,10 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
     plt.loglog(ds, Norm2, label='Norm2')
     plt.loglog(ds, NormMax, label='NormMax')
     plt.loglog(ds, ds**(order), label=f'order-{order }')
-    # plt.loglog(ds, ds**1, label=f'order-{1 }')
 
     # plt.loglog(dt, Norm2, label='Norm2')
     # plt.loglog(dt, NormMax, label='NormMax')
-    # plt.loglog(dt, dt**1, label=f'order-{1 }')
+    # plt.loglog(dt, dt**(order), label=f'order-{order }')
 
 
     plt.xlabel(r'$\Delta s$')
