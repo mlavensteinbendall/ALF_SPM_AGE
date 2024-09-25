@@ -86,6 +86,4 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, c):
  
     plt.show()
 
-    combine = [Norm2, L2norm, NormMax, LMaxnorm]
-
-    return combine
+    return Norm2, L2norm, NormMax, LMaxnorm

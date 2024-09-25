@@ -84,9 +84,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
 
     plt.show()
 
-    combine = [Norm2, L2norm, NormMax, LMaxnorm]
-
-    return combine
+    return Norm2, L2norm, NormMax, LMaxnorm
 
     # # Plot the Analytical and Numerical Solution
     # plt.plot(size, sol, label='Analytical', linestyle='solid')
