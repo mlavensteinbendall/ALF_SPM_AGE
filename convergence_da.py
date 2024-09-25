@@ -2,6 +2,22 @@ import numpy as np # Numpy for numpy
 import matplotlib.pyplot as plt
 
 def convergence_da_plt(age_max, time_max, da, dt, order, c):
+    """Calculates the convergence for varying ds and constant dt.
+    
+    Args:
+        age_max (int):      The max number of age-steps.
+        time_max(float):    The max number of time-steps.
+        da      (float):    The partitions for age-steps.
+        dt      (float):    The partitions for time-steps.
+        order   (int):      The order of the method.
+        c       (int):      The constant of death rate.
+        
+    Returns:
+        Norm2   (array):    A list of the 2-norms.
+        L2norm  (array):    A list of the order of the 2-norms.
+        NormMax (array):    A list of the infinity-norms.
+        LMaxnorm(array):    A list of the order of the infinity-norms.
+    """
 
     n = int(time_max/dt) + 1 # Time-step of comparison.
     Tend = n*dt # Get the associated timepoint value.
@@ -28,7 +44,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
         data = np.zeros([int(time_max/da[i]), Nage])
         sol = np.zeros([Nage])
 
-        data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
+        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
         sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(-c * Tend)        
@@ -80,7 +96,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
     ds_values_str = '_'.join(map(str, da))
 
     # Save the plot to a file -- labels with da values and dt 
-    plt.savefig('ds_plot/fixed_dt/plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }'+ '_order_' + str(order) +'.png', dpi=300)  
+    plt.savefig('da_plot/fixed_dt/plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }'+ '_order_' + str(order) +'.png', dpi=300)  
 
     plt.show()
 

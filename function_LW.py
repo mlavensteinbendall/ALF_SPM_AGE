@@ -1,7 +1,20 @@
 import numpy as np # Numpy for numpy
 import matplotlib.pyplot as plt
 
+
 def LW_SPM(step, time, ds, dt, c):
+    """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
+    
+    Args:
+        step    (array): 
+        time    (array):
+        ds      (int):
+        dt      (int):
+        c       (int):
+        
+    Returns:
+        N       (array of arrays): Represents the time
+    """
 
     # inital condition -- population at t=0
     N = np.zeros([len(time),len(step)])
@@ -16,39 +29,10 @@ def LW_SPM(step, time, ds, dt, c):
     else:
         for i in range(len(step)):
             mu[i] = c
-    # print(dt)
-    # print(ds)
-    k = round(dt/ds/2)
-    print("k = ", k)
-
-    # for t in range(0, len(time)-1):
-
-    #     # Time Splitting
-    #     Ntemp  = np.zeros([len(step)])
-    #     Ntemp2 = np.zeros([len(step)])
-
-    #     # # step 1 -- half time step (death)
-    #     for s in range(0,len(step)):
-    #         # Ntemp[s] = N[t,s] * np.exp( - dt/2 * mu[s] )      # exact solution 
-
-    #         Ntemp[s] = N[t,s-k]
-            
-    #     # step 2 -- full time step (aging)
-    #     for s in range(0,len(step)): 
-    #         # Ntemp2[s] = Ntemp[s-k]                             # exact solution
-
-    #         Ntemp2[s] = Ntemp[s] * np.exp( - dt/2 * mu[s] ) 
-
-    #     # # step 3 -- half time step (death)
-    #     for s in range(0,len(step)):
-    #         # Exact solution
-    #         # N[t+1, s] = Ntemp2[s] * np.exp( - dt/2 * mu[s] )
-
-    #         N[t+1,s] = Ntemp2[s-k]
 
 
 
-# do not delete -- current code
+## NUMERICAL SOLUTION 
     for t in range(0, len(time)-1):
 
         # Time Splitting

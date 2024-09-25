@@ -35,7 +35,7 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     # Calculate the total population using trapezoidal rule
     for i in range(5):
 
-        data = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
+        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
         # print(data)
 
         totalPop_num[i] = trapezoidal_rule( data[-1,:],     ds[i])
@@ -85,9 +85,9 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     # plt.show()
 
 
-    combine = [Norm1, L1norm]
+    # combine = [Norm1, L1norm]
 
-    return combine
+    return Norm1, L1norm
 
 
 

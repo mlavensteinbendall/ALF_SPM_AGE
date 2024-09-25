@@ -160,11 +160,11 @@ cython_debug/
 #.idea/
 
 # Ignore these files
-ds_convergence/
-ds_convergence/*
+da_convergence/
+da_convergence/*
 dt_convergence/
 dt_convergence/*
-ds_plot/
-ds_plot/*
+da_plot/
+da_plot/*
 videos/
 videos/*
