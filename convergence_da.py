@@ -35,15 +35,14 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
 
     for i in range(0, Ntest):
 
-        # Nstep = int(step_max/da[i]) + 1
-        # step = np.zeros([Nstep])
-        # step = np.linspace(0, step_max, Nstep) # Create an array of those sizes.
-        age = np.arange(0, age_max + da[i], da[i])
-        Nage = len(age)
+        # initialize values
+        age = np.arange(0, age_max + da[i], da[i])      # array from 0 to age_max
+        Nage = len(age)                                 # number of elements in age
 
-        data = np.zeros([int(time_max/da[i]), Nage])
-        sol = np.zeros([Nage])
+        data = np.zeros([int(time_max/da[i]), Nage])    # initialize matrix for numerical solution
+        sol = np.zeros([Nage])                          # initialize array for analytical solution
 
+        # Numerical solution -- download relevent data
         data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
@@ -55,18 +54,18 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
         # plt.plot(step,sol) # looks right
         # plt.show()
 
-        # Solve for L-2 and L-max
+        # Calculate the norm 
         Norm2[i]    = ( ( 1 / Nage ) * np.sum( np.abs( data[-1,:] - sol[:] ) **2 ) ) **0.5  # L2 error.
         NormMax[i]  = np.max( np.abs( data[-1,:] - sol[:] ) )                               # L-Max error.
 
 
-    # Calculates the L norms -- comparing with the last (Note: ds is increasing)
+    # Iterate to calculates the L norms -- comparing with the last (Note: ds are decressing)
     for ii in range(0, Ntest - 1):
         L2norm[ii+1]    = np.log( Norm2[ii+1]   / Norm2[ii] )   / np.log( da[ii+1] / da[ii] )
         LMaxnorm[ii+1]  = np.log( NormMax[ii+1] / NormMax[ii] ) / np.log( da[ii+1] / da[ii] )
 
 
-
+    # Print error and order for each combination of ds and dt
     for i in range(0, Ntest):
 
         print('For ds ='            + str( round( da[i],        10  ) ) )
@@ -78,7 +77,6 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
             print('LMax q order: '  + str( round( LMaxnorm[i-1] , 10    ) ) ) # L-Max q estimate.
             print(' ')
 
-    # plt.figure(figsize=(8, 4))
 
     # Plot the log-log for the errors.
     plt.loglog(da, Norm2, label='Norm2')

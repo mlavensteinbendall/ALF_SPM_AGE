@@ -40,11 +40,12 @@ da = np.zeros([Ntest]) # order smallest to largest
 # da[3] = 0.025
 # da[4] = 0.0125
 
-# da[0] = 0.3
-# da[1] = 0.15
-# da[2] = 0.1
-# da[3] = 0.075
-# da[4] = 0.06
+
+# da[0] = 0.15
+# da[1] = da[0] / 2
+# da[2] = da[0] / 4
+# da[3] = da[0] / 6
+# da[4] = da[0] / 8
 
 # da[0] = 0.15
 # da[1] = 0.12
@@ -52,16 +53,34 @@ da = np.zeros([Ntest]) # order smallest to largest
 # da[3] = 0.04
 # da[4] = 0.0375
 
+
+# da[0] = 0.3
+# da[1] = 0.15
+# da[2] = 0.1
+# da[3] = 0.075
+# da[4] = 0.06
+
 # dt = 0.001
 
+# da[0] = dt / 0.1
+# da[1] = dt / 0.2
+# da[2] = dt / 0.4
+# da[3] = dt / 0.5
+# da[4] = dt / 0.8
+
+
 # vary da and dt cases:
-da[0] = 0.0625
+da[0] = 0.1
 da[1] = 0.05
 da[2] = 0.025
 da[3] = 0.0125
-da[4] = 0.003125
+da[4] = 0.00625
 
-dt = 0.5 * da
+# dt = 0.5 * da
+
+dt = 0.00001
+
+
 
 # dt = 0.0001 * da
 # dt = 0.02
