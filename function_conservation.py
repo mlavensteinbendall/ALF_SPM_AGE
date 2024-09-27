@@ -4,6 +4,15 @@ import matplotlib.pyplot as plt
 from tabulate import tabulate
 
 def trapezoidal_rule(fx, dx):
+    """Performs trapezoidal rule
+    
+    Args:
+        fx  (array):    A list of the population at different steps.
+        dx  (int):      The partition of steps.
+        
+    Returns:
+        result  (array): Represents the time
+    """
 
     fx_sum = np.sum(fx[1:-1])
 
@@ -13,7 +22,23 @@ def trapezoidal_rule(fx, dx):
 
 
 
-def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
+def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order, folder):
+    """Performs trapezoidal rule
+    
+    Args:
+        Ntest  (array):    A list of the population at different steps.
+        time    ():
+        ds      (int):
+        c       (int):
+        Smax    ():
+        Tmax    ():
+        dt      ():
+        order   ():
+        
+    Returns:
+        Norm1  (array):     A list of 1-norm errors
+        L1norm  (array):    A list of 1-norm orders.
+    """
 
     totalPop_num = np.zeros([5]) 
 
@@ -70,19 +95,19 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order):
     plt.title('Error of Total Population')
     plt.legend()
 
-    # # Convert ds array values to a string
-    # ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
+    # Convert ds array values to a string
+    ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
-    # # Save the plot to a file -- labels with da values and dt 
-    # if isinstance(dt, np.ndarray):
-    #     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+    # Save the plot to a file -- labels with da values and dt 
+    if isinstance(dt, np.ndarray):
+        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
-    #     plt.savefig('ds_plot/varied_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order) +'.png', dpi=300)  
+        plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '.png', dpi=300)  
 
-    # else:
-    #     plt.savefig('ds_plot/fixed_dt/plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(c) + '_order_'+ str(order) +'.png', dpi=300)  
+    else:
+        plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(dt) + '.png', dpi=300)  
 
-    # plt.show()
+    plt.show()
 
 
     # combine = [Norm1, L1norm]

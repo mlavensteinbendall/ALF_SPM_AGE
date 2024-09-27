@@ -53,9 +53,9 @@ def LW_SPM(step, time, ds, dt, c):
             # Ntemp2[s] = Ntemp[s] * np.exp( - dt * mu[s] )      # exact solution 
 
             # RK2
-            k1        = Ntemp[s] * mu[s]                    # slope at current time
-            N_star    = Ntemp[s] - dt * k1                  # intermediate value
-            k2        = N_star * mu[s]                      # slope at intermediate value
+            k1        = Ntemp[s] * mu[s]                    # slope at beginning of interval
+            N_star    = Ntemp[s] - dt * k1                  # slope at the midpoint of interval
+            k2        = N_star * mu[s]                      # slope at end of interval
             Ntemp2[s] = Ntemp[s] - (dt * 0.5) * (k1 + k2)   # update value
 
         # step 3 -- half time step (Aging)

@@ -16,13 +16,20 @@ import matplotlib.pyplot    as plt
 from print_tab_conv         import tabulate_conv
 from function_LW            import LW_SPM
 # from function_LW_steve      import LW_SPM
+import timeit
+
+
+start = timeit.default_timer()
 
 ## INITIAL CONDITIONS
 Amax = 15       # max age
 Tmax = 0.5      # max time
 order = 2       # order of method
-c = 1           # constant for mu
+c = 0           # constant for mu
 Ntest = 5       # number of cases
+
+# folder = 'LW-EX_mu_' + str(c)       # Name of folder for test
+folder = 'LW-RK2_mu_' + str(c)       # Name of folder for test
 
 # need to chose da and dt so that the last value in the array are Amax and Tmax
 da = np.zeros([Ntest]) # order smallest to largest
@@ -79,6 +86,8 @@ da[4] = 0.00625
 # dt = 0.5 * da
 
 dt = 0.00001
+
+# dt = 0.001
 
 
 
@@ -161,6 +170,7 @@ for i in range(len(da)):
     # get inidices of initial, middle, and last time step
     plot_indices = [0, Ntime // 2, Ntime - 1]
 
+    plt.close()
     # plot numerical and analytical solution
     for t_index in plot_indices:
         plt.plot(age, sol[t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='-')     # analytical 
@@ -176,13 +186,14 @@ for i in range(len(da)):
     # save plots to folder
     if isinstance(dt, np.ndarray):
         # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('da_plot/varied_dt/plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
+        # plt.savefig('da_plot/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
+        plt.savefig('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) + '.png', dpi=300)  
     else:
         # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('da_plot/fixed_dt/plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
+        plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(dt) + '_order_'+ str(order) + '.png', dpi=300) 
 
     # show plot
-    plt.show()
+    # plt.show()
 
     # # error check -- using this with Shilpa's matlab code to make sure we are getting the same values
     # print(data[-1, 99:109])
@@ -190,22 +201,25 @@ for i in range(len(da)):
 
 # END LOOP +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+# Pervents corrupting convergence plot
+plt.close()
 
 ## CONVERGENCE ------------------------------------------------------------------------------------------
 # Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
 if isinstance(dt, np.ndarray):
-    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, c) 
+    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, c, folder) 
 else:
-    Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, c)
+    Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, c, folder)
 
 ## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
 # Checks conservation, returns norm and order of conservation
-Norm1, L1norm = conservation_plt(Ntest, time, da, c, Amax, Tmax, dt, order)
+plt.close()
+Norm1, L1norm = conservation_plt(Ntest, time, da, c, Amax, Tmax, dt, order, folder)
 
 
 ## PRINT NORMS --------------------------------------------------------------------------------------------
 # print latex table
-tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm)
+tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder, c)
 
 # # print excel compatible table
 # if isinstance(dt, np.ndarray):
@@ -227,3 +241,7 @@ tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm)
 # plt.title(f'Initial Condition by Ages (t = 0)')
 # plt.legend()
 # plt.show()
+
+stop = timeit.default_timer()
+
+print('Time: ', stop - start)

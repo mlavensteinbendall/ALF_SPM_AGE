@@ -1,7 +1,7 @@
 import numpy as np # Numpy for numpy
 import matplotlib.pyplot as plt
 
-def convergence_da_plt(age_max, time_max, da, dt, order, c):
+def convergence_da_plt(age_max, time_max, da, dt, order, c, folder):
     """Calculates the convergence for varying ds and constant dt.
     
     Args:
@@ -82,8 +82,6 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
     plt.loglog(da, Norm2, label='Norm2')
     plt.loglog(da, NormMax, label='NormMax')
     plt.loglog(da, da**(order), label=f'order-{order }')
-    # plt.loglog(da, da**1, label=f'order-{1 }')
-
 
     plt.xlabel(r'$\Delta a$')
     plt.ylabel('Norm')
@@ -94,7 +92,7 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c):
     ds_values_str = '_'.join(map(str, da))
 
     # Save the plot to a file -- labels with da values and dt 
-    plt.savefig('da_plot/fixed_dt/plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }'+ '_order_' + str(order) +'.png', dpi=300)  
+    plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
 
     plt.show()
 
