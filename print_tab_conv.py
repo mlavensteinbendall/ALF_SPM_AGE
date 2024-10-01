@@ -1,7 +1,23 @@
 from tabulate import tabulate
 import numpy as np
 
-def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm):
+def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder, c):
+    """Prints table for latex document.
+    
+    Args:
+        dt      (float):    The partitions for time-steps.
+        ds      (int):      The partitions for steps.
+        Norm2   (array):    A list of 2-norm errors.
+        L2norm  (array):    A list of 2-norm orders.
+        NormMax (array):    A list of infinity-norm errors.
+        LMaxnorm(array):    A list of infinity-norm orders.
+        Norm1   (array):    A list of 1-norm errors.
+        L1norm  (array):    A list of 1-norm orders.
+        
+    Returns:
+        Print table
+    """
+
     # Define the headers
     headers = ["$\Delta{t}$","$\Delta{s}$", "$||N-N_{ex}||_2$", "$q_2$", "$||N-N_{ex}||_\infty$", "$q_\infty$", "$||N-N_{ex}||_1$", "$q_1$"]
 
@@ -16,3 +32,18 @@ def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm):
 
     # Print or save the LaTeX table
     print(latex_table)
+
+    # Convert ds array values to a string
+    ds_values_str = '_'.join(map(str, np.round(ds, 6) ))
+    dt_values_str = '_'.join(map(str, np.round(ds, 6) ))
+
+        # save plots to folder
+    if isinstance(dt, np.ndarray):
+        file2write=open('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '.txt' ,'w')
+        file2write.write(latex_table)
+        file2write.close()
+    else:
+        # Save the plot to a file -- labels with da values and dt 
+        file2write=open('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + str(dt) + '.txt'  , 'w')
+        file2write.write(latex_table)
+        file2write.close()

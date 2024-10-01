@@ -1,182 +1,247 @@
 # Author: Morgan Lavenstein Bendall
-# Objective: This calls the function of our model and runs at different ds and dt.
+# Objective: This calls the function of our model and runs at different da and dt.
+
+
+# Tasks:
+#   - need to change file name from upwind to lax-wendroff or something else
 
 import numpy as np
 from function_upwind_age    import UPW_SPM
-# from convergence_ds         import convergence_ds_plt
+# from convergence_da         import convergence_da_plt
 from function_conservation  import conservation_plt
 from convergence_dt         import convergence_dt_plt
 # from convergence_dt_no_exact_sol         import convergence_dt_plt
 from convergence_da         import convergence_da_plt
 import matplotlib.pyplot    as plt 
 from print_tab_conv         import tabulate_conv
-
-# initial conditions
-Smax = 15
-Tmax = 1
-order = 2
-c = 1 # constant for mu
-
-Ntest = 5
-
-ds = np.zeros([Ntest]) # order smallest to largest
-# ds[4] = 0.1
-# ds[3] = 0.2
-# ds[2] = 0.3
-# ds[1] = 0.4
-# ds[0] = 0.5
-
-# # 1 order good - covergence
-# ds[0] = 0.06
-# ds[1] = 0.07 
-# ds[2] = 0.08
-# ds[3] = 0.09
-# ds[4] = 0.095
-# if it too high it might be that the values are too large
-
-# 1 order 
-#   - this worked for 2nd order 
-# ds[0] = 0.05
-# ds[1] = 0.04 
-# ds[2] = 0.03
-# ds[3] = 0.02
-# ds[4] = 0.01
-
-ds[0] = 0.06
-ds[1] = 0.05
-ds[2] = 0.04
-ds[3] = 0.03
-ds[4] = 0.02
-
-# dt = 0.0001 # da ten times smaller^^
-
-# worked a lot better for order 2 but still not great
-# ds[0] = 0.006
-# ds[1] = 0.012
-# ds[2] = 0.024
-# ds[3] = 0.048
-# ds[4] = 0.096
+from function_LW            import LW_SPM
+# from function_LW_steve      import LW_SPM
+import timeit
 
 
-dt = np.zeros([Ntest])
-dt[0] = 0.9 * ds[0]
-dt[1] = 0.9 * ds[1]
-dt[2] = 0.9 * ds[2]
-dt[3] = 0.9 * ds[3]
-dt[4] = 0.9 * ds[4]
+start = timeit.default_timer()
 
-# dt = np.zeros([Ntest])
-# dt[0] = 0.5 * ds[0]
-# dt[1] = 0.5 * ds[1]
-# dt[2] = 0.5 * ds[2]
-# dt[3] = 0.5 * ds[3]
-# dt[4] = 0.5 * ds[4]
+## INITIAL CONDITIONS
+Amax = 15       # max age
+Tmax = 0.5      # max time
+order = 2       # order of method
+c = 0           # constant for mu
+Ntest = 5       # number of cases
 
-# dt = np.zeros([Ntest])
-# dt[0] = 0.1 * ds[0]
-# dt[1] = 0.1 * ds[1]
-# dt[2] = 0.1 * ds[2]
-# dt[3] = 0.1 * ds[3]
-# dt[4] = 0.1 * ds[4]
+# folder = 'LW-EX_mu_' + str(c)       # Name of folder for test
+folder = 'LW-RK2_mu_' + str(c)       # Name of folder for test
 
-# dt = np.zeros([ntests])
-# dt[0] = 0.006/2
-# dt[1] = 0.007/2
-# dt[2] = 0.008/2
-# dt[3] = 0.009/2
-# dt[4] = 0.0095/2
+# need to chose da and dt so that the last value in the array are Amax and Tmax
+da = np.zeros([Ntest]) # order smallest to largest
+
+# Values that work with: Amax = 15 and Tmax = 0.5 
+# da[0] = 0.15
+# da[1] = 0.1
+# da[2] = 0.05
+# da[3] = 0.03
+# da[4] = 0.02
+
+# da[0] = 0.15
+# da[1] = 0.075
+# da[2] = 0.05
+# da[3] = 0.025
+# da[4] = 0.0125
 
 
-print('Upwind Order = ' + str(order))
-for i in range(len(ds)):
+# da[0] = 0.15
+# da[1] = da[0] / 2
+# da[2] = da[0] / 4
+# da[3] = da[0] / 6
+# da[4] = da[0] / 8
 
-    print('Entering loop ' + str(i))
+# da[0] = 0.15
+# da[1] = 0.12
+# da[2] = 0.06
+# da[3] = 0.04
+# da[4] = 0.0375
+
+
+# da[0] = 0.3
+# da[1] = 0.15
+# da[2] = 0.1
+# da[3] = 0.075
+# da[4] = 0.06
+
+# dt = 0.001
+
+# da[0] = dt / 0.1
+# da[1] = dt / 0.2
+# da[2] = dt / 0.4
+# da[3] = dt / 0.5
+# da[4] = dt / 0.8
+
+
+# vary da and dt cases:
+da[0] = 0.1
+da[1] = 0.05
+da[2] = 0.025
+da[3] = 0.0125
+da[4] = 0.00625
+
+dt = 0.5 * da
+
+# dt = 0.00001
+
+# dt = 0.001
+
+
+
+# dt = 0.0001 * da
+# dt = 0.02
+# dt = 0.00001 # da ten times smaller^^
+# dt = 0.0001 # this works for da convergence
+
+filename = 'da_convergence/' 
+
+
+print('Lax-Wendroff Order = ' + str(order))
+
+# Using the given da and dt values, this loop calculates the numerical solution, solve the analytical 
+# solution, and plots the numerical vs. analytical solution. 
+# BEGIN LOOP ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+for i in range(len(da)):
+
+    print('Entering loop ' + str(i))                # progress update, loop began
 
     # initalize arrays
-    Nsize = int(Smax/ds[i]) + 1
-    size = np.linspace(0,Smax, Nsize) 
+    age = np.arange(0, Amax + da[i], da[i])       # array from 0 to Amax
+    Nage = len(age)                               # number of elements in age
+    print("age:", age[-1])                        # check that last element is Amax
 
-    #  # initalize arrays
-    # Ntime = int(Tmax/dt) + 1
-    # time = np.linspace(0,Tmax, Ntime)
-
+    ## NUMERICAL SOLUTION 
+    # IF da and dt are varied, do this -----------------------------------------------------------
     if isinstance(dt, np.ndarray):
+
         # initalize arrays
-        Ntime = int(Tmax/dt[i]) + 1
-        time = np.linspace(0,Tmax, Ntime)
+        time = np.arange(0,Tmax + dt[i], dt[i])     # array from 0 to Tmax
+        Ntime = len(time)                           # number of elements in time
+        print("Time:", time[-1])                    # check that last element is Tmax
 
-        data = np.zeros([Ntime,Nsize])
+        # initalize data matrix
+        data = np.zeros([Ntime,Nage])
 
-        print('CFL: ' + str(round(dt[i]/ds[i], 5)))
-        data = UPW_SPM(size, time, ds[i], dt[i], order, c)
+        # print CFL 
+        print('CFL: ' + str(round(dt[i]/da[i], 5)))   
 
+        # calculate solution
+        # data = UPW_SPM(age, time, da[i], dt[i], order, c)    # upwind method
+        data = LW_SPM(age, time, da[i], dt[i], c)              # lax-wendroff method
+    
+    # ELSE da is varied and dt is constant, do this ------------------------------------------------
     else:
         # initalize arrays
-        Ntime = int(Tmax/dt) + 1
-        time = np.linspace(0,Tmax, Ntime)
+        time = np.arange(0,Tmax + dt, dt)           # array from 0 to Tmax
+        Ntime = len(time)                           # number of elements in time
+        print("Time:", time[-1])                    # check that the last element is Tmax
 
-        data = np.zeros([Ntime,Nsize])
+        # initialize matrix
+        data = np.zeros([Ntime,Nage])
 
-        print('CFL: ' + str(round(dt/ds[i], 5)))
-        data = UPW_SPM(size, time, ds[i], dt, order, c)
+        # print CFL
+        print('CFL: ' + str(round(dt/da[i], 5)))
 
-    np.savetxt('ds_convergence/upwind_num_'+ str(i) +'.txt', data)  # save data to fileuu
+        # calculate solution
+        # data = UPW_SPM(age, time, da[i], dt, order, c)       # upwind method
+        data = LW_SPM(age, time, da[i], dt, c)                 # lax-wendroff method
 
-    print('Loop ' + str(i) + ' Complete.') # Progress update, loop end.
 
-
-    # analytical solution --------------------------------------------------------------------------------
-    sol = np.zeros([len(time),len(size)])
+    # Save data to a file --------------------------------------------------------------------------
+    np.savetxt('da_convergence/num_'+ str(i) +'.txt', data)     # save data to file
     
+    print('Loop ' + str(i) + ' Complete.')                      # progress update, loop end
+
+
+    ## ANALYTICAL SOLUTION 
+    # initialize analytical solution matrix
+    sol = np.zeros([len(time),len(age)])
+    
+    # calculate the analytical solution for every age at time t
     for i_t in range(0, len(time)):
         # Calculate the analytical solution
-        sol[i_t,:] = np.exp(-(size - ( time[i_t] + 5))**2) * np.exp( - c * time[i_t]) 
+        sol[i_t,:] = np.exp(-(age - ( time[i_t] + 5))**2) * np.exp( - c * time[i_t]) 
 
 
-    # Plots the numerical solution at initial, middle, and last time steps
-    plot_indices = [0, Ntime // 2, Ntime - 1]  # Indices of initial, middle, and last time steps
+    ## COMPARTISION PLOT BTWN NUMERICAL AND ANALYTICAL
+    # get inidices of initial, middle, and last time step
+    plot_indices = [0, Ntime // 2, Ntime - 1]
+
+    plt.close()
+    # plot numerical and analytical solution
     for t_index in plot_indices:
-        plt.plot(size, data[t_index, :], label=f'Numerical at time {round(time[t_index], 1)  }', linestyle='--')
-        plt.plot(size, sol[t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='-')
+        plt.plot(age, sol[t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='-')     # analytical 
+        plt.plot(age, data[t_index, :], label=f'Numerical at time {round(time[t_index], 1)  }', linestyle='--')    # numerical 
 
-
+    # aesthetic of plot
     plt.axhline(y=1, color='r', linestyle='--', label='y=1')
     plt.xlabel('Step')
     plt.ylabel('Population')
-    plt.title(f'Population by Step when ds = {ds[i] }')
+    plt.title(f'Population by Step when da = {da[i] }')
     plt.legend()
 
+    # save plots to folder
     if isinstance(dt, np.ndarray):
         # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('ds_plot/varied_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(round(dt[i],3)) + '_order_'+ str(order) +'.png', dpi=300)  
+        # plt.savefig('da_plot/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) +'.png', dpi=300)  
+        plt.savefig('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '_order_'+ str(order) + '.png', dpi=300)  
     else:
         # Save the plot to a file -- labels with da values and dt 
-        plt.savefig('ds_plot/fixed_dt/plot_mu_' + str(c) + '_ds_' + str(ds[i]) + '_dt_' + str(dt) + '_order_'+ str(order) +'.png', dpi=300) 
+        plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + str(da[i]) + '_dt_' + str(dt) + '_order_'+ str(order) + '.png', dpi=300) 
 
-    plt.show()
+    # show plot
+    # plt.show()
 
-# Plot the convergence of da, returns Norms and order of convergence
-# Norm = convergence_da_plt(Smax, Tmax, ds, dt, order, c)
-
-# Plot the convergence of dt
-Norm = convergence_dt_plt(Smax, Tmax, ds, dt, order, c) 
+    # # error check -- using this with Shilpa's matlab code to make sure we are getting the same values
+    # print(data[-1, 99:109])
 
 
+# END LOOP +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Pervents corrupting convergence plot
+plt.close()
+
+## CONVERGENCE ------------------------------------------------------------------------------------------
+# Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
+if isinstance(dt, np.ndarray):
+    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, c, folder) 
+else:
+    Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, c, folder)
+
+## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
 # Checks conservation, returns norm and order of conservation
-conservation = conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order)
+plt.close()
+Norm1, L1norm = conservation_plt(Ntest, time, da, c, Amax, Tmax, dt, order, folder)
 
-# Makes latex table
-tabulate_conv(dt, ds, Norm[0], Norm[1], Norm[2], Norm[3], conservation[0], conservation[1])
+
+## PRINT NORMS --------------------------------------------------------------------------------------------
+# print latex table
+tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder, c)
+
+# # print excel compatible table
+# if isinstance(dt, np.ndarray):
+#     for i in range(len(da)):
+#         print(f"{dt[i]}, {da[i]}, {Norm2[i]}, {L2norm[i]}, {NormMax[i]}, {LMaxnorm[i]}, {Norm1[i]}, {L1norm[i]}")
+# else:
+#     for i in range(len(da)):
+#         print(f"{dt}, {da[i]}, {Norm2[i]}, {L2norm[i]}, {NormMax[i]}, {LMaxnorm[i]}, {Norm1[i]}, {L1norm[i]}")
 
 
 # Print the intial condition --------------------------------------------------------------------------------
 # # analytical solution 
-# sol = np.zeros([len(size)])
-# sol = np.exp(-(size - (5))**2) 
+# sol = np.zeros([len(age)])
+# sol = np.exp(-(age - (5))**2) 
 
-# plt.plot(size, sol)
+# plt.plot(age, sol)
 # plt.xlabel('Age')
 # plt.ylabel('Population')
 # plt.title(f'Initial Condition by Ages (t = 0)')
 # plt.legend()
 # plt.show()
+
+stop = timeit.default_timer()
+
+print('Time: ', stop - start)

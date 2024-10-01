@@ -46,13 +46,10 @@ def UPW_SPM(step, time, ds, dt, order, c):
             # for a in range(1,len(step)):         
                 # N[t+1,a] = N[t,a] - dt *( ( (N[t,a] - N[t,a-1]) / ds ) + mu[a] * N[t,a] ) # first order upwind method
    
-    dtda = dt/ds 
 
     if order == 2:
 
         for t in range(0, len(time) - 1):
-
-            exact_sol = np.exp( - dt * mu ) 
             
             # Time Splitting
             Ntemp = np.zeros([len(step)])
@@ -63,12 +60,19 @@ def UPW_SPM(step, time, ds, dt, order, c):
                 Ntemp[a] = N[t,a] - (dt/(4*ds)) * dNda 
 
             # step 2 -- time step 
-            Ntemp[:] = Ntemp[:] * exact_sol[:]      # exact solution 
+            exact_sol = np.exp( - dt * mu ) 
+            Ntemp[:] = Ntemp[:] * exact_sol[:]          # exact solution
+            # for a in range(2,len(step)): 
+            #     Ntemp[a] = Ntemp[a] * np.exp( - dt * mu[a] )      # exact solution 
 
             # step 3 -- half time step
             for a in range(2,len(step)): 
                 dNda = (3 * Ntemp[a] - 4 * Ntemp[a-1] + Ntemp[a-2]) 
                 N[t+1,a] = Ntemp[a] - (dt/(4*ds)) * dNda 
+
+            # for a in range(2,len(step)): 
+            #     dNda = (3 * N[t,a] - 4 * N[t,a-1] + N[t,a-2]) 
+            #     N[t+1, a] = N[t,a] - (dt/(2*ds)) * dNda    
 
 
     # trying to make it faster
