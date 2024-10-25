@@ -166,3 +166,4 @@ da_plot/
 da_plot/*
 videos/
 videos/*
+.DS_Store
