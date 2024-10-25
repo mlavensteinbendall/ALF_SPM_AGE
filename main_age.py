@@ -5,8 +5,8 @@ import numpy as np
 from old.function_upwind_age    import UPW_SPM
 # from convergence_da         import convergence_da_plt
 from function_conservation  import conservation_plt
-from convergence_dt         import convergence_dt_plt
-# from convergence_dt_no_exact_sol         import convergence_dt_plt
+# from convergence_dt         import convergence_dt_plt
+from convergence_dt_no_exact_sol         import convergence_dt_plt
 from convergence_da         import convergence_da_plt
 import matplotlib.pyplot    as plt 
 from print_tab_conv         import tabulate_conv
@@ -30,7 +30,7 @@ Ntest = 5       # number of cases
 # Mortality set up
 m = 0.5            # constant for mux
 c = round(m)
-constant = False    # True for constant mu, False for function mu
+constant = True    # True for constant mu, False for function mu
 b = 0              # y-intercept
 
 # Folder for plots and convergence tests
@@ -217,8 +217,8 @@ plt.close()
 ## CONVERGENCE ------------------------------------------------------------------------------------------
 # Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
 if isinstance(dt, np.ndarray):
-    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant, folder) 
-    # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, da, dt, order)
+    # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant, folder) 
+    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, da, dt, order)
 else:
     Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, m, b, constant, folder)
 
