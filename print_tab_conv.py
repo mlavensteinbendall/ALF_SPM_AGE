@@ -1,6 +1,27 @@
 from tabulate import tabulate
 import numpy as np
 
+
+
+def ensure_size(test, arr):
+    """Adds zeros to the begginning of arrays to make sure they all have the number of tests that where performed
+    
+    Args:
+        test    (int):      Number of tests performed
+        arr     (array):    Array 
+    
+    Returns:
+        arr     (array):    Array of length of test"""
+    
+    if len(arr) < test:
+        # Calculate how many zeros to prepend
+        num_zeros = test - len(arr)
+        # Prepend the zeros
+        arr = np.pad(arr, (num_zeros, 0), 'constant')
+    return arr
+
+
+
 def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder, c):
     """Prints table for latex document.
     
@@ -24,6 +45,14 @@ def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folde
     time = np.zeros([len(ds)])
     time[:] = dt
 
+    test = len(ds)
+
+    Norm2    = ensure_size(test, Norm2)
+    L2norm   = ensure_size(test, L2norm)
+    NormMax  = ensure_size(test, NormMax)
+    LMaxnorm = ensure_size(test, LMaxnorm)
+
+
     # Combine the data into a list of tuples
     latex = list(zip(time, ds,  Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm))
 
@@ -37,13 +66,13 @@ def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folde
     ds_values_str = '_'.join(map(str, np.round(ds, 6) ))
     dt_values_str = '_'.join(map(str, np.round(ds, 6) ))
 
-        # save plots to folder
-    if isinstance(dt, np.ndarray):
-        file2write=open('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '.txt' ,'w')
-        file2write.write(latex_table)
-        file2write.close()
-    else:
-        # Save the plot to a file -- labels with da values and dt 
-        file2write=open('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + str(dt) + '.txt'  , 'w')
-        file2write.write(latex_table)
-        file2write.close()
+    #     # save plots to folder
+    # if isinstance(dt, np.ndarray):
+    #     file2write=open('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '.txt' ,'w')
+    #     file2write.write(latex_table)
+    #     file2write.close()
+    # else:
+    #     # Save the plot to a file -- labels with da values and dt 
+    #     file2write=open('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + str(dt) + '.txt'  , 'w')
+    #     file2write.write(latex_table)
+    #     file2write.close()

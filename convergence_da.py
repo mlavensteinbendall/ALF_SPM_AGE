@@ -1,7 +1,9 @@
 import numpy as np # Numpy for numpy
 import matplotlib.pyplot as plt
 
-def convergence_da_plt(age_max, time_max, da, dt, order, c, folder):
+from function_mortality import mortality
+
+def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder):
     """Calculates the convergence for varying ds and constant dt.
     
     Args:
@@ -39,6 +41,9 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c, folder):
         age = np.arange(0, age_max + da[i], da[i])      # array from 0 to age_max
         Nage = len(age)                                 # number of elements in age
 
+        mu = np.zeros(Nage)
+        mu = mortality(age_max, age, m, b, constant)
+
         data = np.zeros([int(time_max/da[i]), Nage])    # initialize matrix for numerical solution
         sol = np.zeros([Nage])                          # initialize array for analytical solution
 
@@ -46,7 +51,8 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c, folder):
         data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
-        sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(-c * Tend)        
+        sol = np.exp(-(age - ( Tend + 5))**2) * np.exp( - mu * Tend)    # with advection 
+        # sol = np.exp(-(age - 5)**2) * np.exp( - mu * Tend)            # without advection
 
         
         # # plt data vs sol
@@ -91,8 +97,8 @@ def convergence_da_plt(age_max, time_max, da, dt, order, c, folder):
     # Convert ds array values to a string
     ds_values_str = '_'.join(map(str, da))
 
-    # Save the plot to a file -- labels with da values and dt 
-    plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
+    # # Save the plot to a file -- labels with da values and dt 
+    # plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
 
     plt.show()
 

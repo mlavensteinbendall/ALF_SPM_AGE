@@ -1,7 +1,7 @@
-import numpy as np # Numpy for numpy
+import numpy as np
 import matplotlib.pyplot as plt
 
-def convergence_dt_plt(Smax, Tmax, ds, dt):
+def convergence_dt_plt(Smax, ds, dt, order):
 
     Ntest = len(dt)
 
@@ -11,53 +11,62 @@ def convergence_dt_plt(Smax, Tmax, ds, dt):
     L2norm = np.zeros([Ntest-2])
     LMaxnorm = np.zeros([Ntest-2])
 
-
     for i in range(0, Ntest-1):
 
-        Nsize   = int(Smax/ds[i+1])+1
-        size    = np.zeros([Nsize])
-        size    = np.linspace(0,Smax,Nsize) # Create an array of those sizes.
+        size = np.arange(0, Smax + ds[i], ds[i])  # Create an array for mesh size
+        Nsize = len(size)
 
-        data1   = np.loadtxt('ds_convergence/upwind_num_' + str(i) + '.txt') # Load in relevant data.
-        data2   = np.loadtxt('ds_convergence/upwind_num_' + str(i+1) + '.txt') # Load in relevant data.
+        # Load in relevant data for both mesh sizes
+        data1 = np.loadtxt(f'da_convergence/num_{i}.txt') 
+        data2 = np.loadtxt(f'da_convergence/num_{i+1}.txt')
 
-        # Calculate the equivilent 
-        tinterest = 0.5 # Define the time where the calculations are compared.
-        n1      = int(tinterest/dt[i]) # Get fine-data time-step.
-        n2      = int(tinterest/dt[i+1]) # Get corse-data time-step.
+        # Time of interest to compare
+        tinterest = 0.5
+        n1 = int(tinterest/dt[i])     # Time step index for data1
+        n2 = int(tinterest/dt[i+1])   # Time step index for data2
 
-        # Solve for L-2 and L-max
-        Norm2[i]    = ( ( 1 / len(size) ) * np.sum( ( data1[n1,0::2] - data2[n2,:] ) **2 ) ) **0.5 # L2 error.
-        NormMax[i]  = np.max( np.abs( data1[n1,0::2] - data2[n2,:] ) )                             # L-Max error.
+        # Solve for L2 and L-max norms
+        Norm2[i] = np.sqrt(np.mean((data1[n1, :] - data2[n2,  ::2])**2))  # L2 norm
+        NormMax[i] = np.max(np.abs(data1[n1, :] - data2[n2,  ::2]))       # L∞ norm
 
-        if i > 0 :
-            # Loop through the remaining datasets.
-            for ii in range(0,Ntest-2):
-                # L2norm[ii-1]    = np.log( Norm2[ii-1]   / Norm2[ii] )   / np.log( ds[ii-1] / ds[ii] )
-                # LMaxnorm[ii-1]  = np.log( NormMax[ii-1] / NormMax[ii] ) / np.log( ds[ii-1] / ds[ii] )
+        # Calculate the order of convergence for norms
+        if i > 0:
+            print(ds[i])
+            print(ds[i-1])
+            L2norm[i-1] = np.log(Norm2[i] / Norm2[i-1]) / np.log(ds[i] / ds[i-1])
+            LMaxnorm[i-1] = np.log(NormMax[i] / NormMax[i-1]) / np.log(ds[i] / ds[i-1])
 
-                L2norm[ii]    = np.log( Norm2[ii+1]   / Norm2[ii] )   / np.log( ds[ii+1] / ds[ii] )
-                LMaxnorm[ii]  = np.log( NormMax[ii+1] / NormMax[ii] ) / np.log( ds[ii+1] / ds[ii] )
-
-
+    # Display the norms and errors
     for i in range(0, Ntest-1):
+        print(f'For dt = {round(ds[i], 10)} vs dt = {round(ds[i+1], 10)}')
+        print(f'Norm 2 : {round(Norm2[i], 10)}')
+        print(f'Norm inf : {round(NormMax[i], 10)}')
 
-        print('For dt ='    + str( round( dt[i],10      ) ) + ' v.s. ' 'For dt ='    + str( round( dt[i+1],10      ) ))
-        print('Norm 2 : '   + str( round( Norm2[i], 10  ) ) )
-        print('Norm inf : ' + str( round( NormMax[i], 10) ) )
+        if i > 0:
+            print(f'L2 q error: {round(L2norm[i-1], 10)}')  # L2 order of convergence
+            print(f'LMax q error: {round(LMaxnorm[i-1], 10)}')  # L∞ order of convergence
+        print('')
 
-        # L2 Norm and # LMax Norm
-        print('L2 q error: '     + str( round( L2norm[ii-1]   , 10    ))) # L2 q estimate.
-        print('LMax q error: '   + str( round( LMaxnorm[ii-1] , 10    ))) # L-Max q estimate.
-        print(' ')
-
-    # Plot the log-log for the errors.
-    plt.loglog(Norm2, label='Norm2')
-    plt.loglog(NormMax, label='NormMax')
-    plt.loglog(dt**2, label='order-2')
+    # Plot the log-log for the errors
+    plt.loglog(dt[:-1], Norm2, label='Norm2')
+    plt.loglog(dt[:-1], NormMax, label='NormMax')
+    plt.loglog(dt[:-1], dt[:-1]**order, label=f'Order-{order}')
 
     plt.xlabel('dt')
     plt.ylabel('Norm')
     plt.title('Convergence based on dt')
     plt.legend()
     plt.show()
+
+    return Norm2, L2norm, NormMax, LMaxnorm
+
+# Test if convergence is working
+# Mesh options and dt
+# da = np.array([0.1, 0.05, 0.025, 0.0125, 0.00625])
+# dt = 0.5 * da  # Time steps based on mesh size
+
+# # Run the function with these parameters
+# Smax = 30.0  # Example Smax
+# order = 2   # Example order of accuracy
+
+# convergence_dt_plt(Smax, da, dt, order)

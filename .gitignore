@@ -162,8 +162,6 @@ cython_debug/
 # Ignore these files
 da_convergence/
 da_convergence/*
-dt_convergence/
-dt_convergence/*
 da_plot/
 da_plot/*
 videos/

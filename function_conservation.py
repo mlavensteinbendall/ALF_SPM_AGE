@@ -98,14 +98,14 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order, folder):
     # Convert ds array values to a string
     ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
-    # Save the plot to a file -- labels with da values and dt 
-    if isinstance(dt, np.ndarray):
-        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+    # # Save the plot to a file -- labels with da values and dt 
+    # if isinstance(dt, np.ndarray):
+    #     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
-        plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '.png', dpi=300)  
+    #     plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '.png', dpi=300)  
 
-    else:
-        plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(dt) + '.png', dpi=300)  
+    # else:
+    #     plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(dt) + '.png', dpi=300)  
 
     plt.show()
 
