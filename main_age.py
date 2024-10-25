@@ -11,7 +11,6 @@ from convergence_da         import convergence_da_plt
 import matplotlib.pyplot    as plt 
 from print_tab_conv         import tabulate_conv
 from function_LW            import LW_SPM
-# from function_LW_steve      import LW_SPM
 import timeit
 from old.RK2_test             import RK2_function
 
