@@ -2,7 +2,7 @@
 # Objective: This calls the function of our model and runs at different da and dt.
 
 import numpy as np
-from function_upwind_age    import UPW_SPM
+from old.function_upwind_age    import UPW_SPM
 # from convergence_da         import convergence_da_plt
 from function_conservation  import conservation_plt
 from convergence_dt         import convergence_dt_plt
@@ -13,7 +13,7 @@ from print_tab_conv         import tabulate_conv
 from function_LW            import LW_SPM
 # from function_LW_steve      import LW_SPM
 import timeit
-from RK2_test             import RK2_function
+from old.RK2_test             import RK2_function
 
 from function_mortality import mortality
 
