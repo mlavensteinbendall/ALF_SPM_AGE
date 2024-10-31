@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def convergence_dt_plt(Smax, ds, dt, order):
+def convergence_dt_plt(Smax, ds, dt, order, folder):
+
+    print('Calculate convergence varying da and dt')
 
     Ntest = len(dt)
 
@@ -38,7 +40,7 @@ def convergence_dt_plt(Smax, ds, dt, order):
 
     # Display the norms and errors
     for i in range(0, Ntest-1):
-        print(f'For dt = {round(ds[i], 10)} vs dt = {round(ds[i+1], 10)}')
+        print(f'For dt = {round(dt[i], 10)} vs dt = {round(dt[i+1], 10)}')
         print(f'Norm 2 : {round(Norm2[i], 10)}')
         print(f'Norm inf : {round(NormMax[i], 10)}')
 
@@ -54,8 +56,16 @@ def convergence_dt_plt(Smax, ds, dt, order):
 
     plt.xlabel('dt')
     plt.ylabel('Norm')
-    plt.title('Convergence based on dt')
+    plt.title('Convergence based on varying ' + r'$\Delta a$' + ' and ' + r'$\Delta t$')
     plt.legend()
+
+    # Convert ds array values to a string
+    ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
+    dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+
+
+    # Save the plot to a file -- labels with da values and dt 
+    plt.savefig('da_plot/' + folder + '/varied_dt/lw-ex_plot_conv_mu_' + str(0) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order)  +'.png', dpi=300)  
     plt.show()
 
     return Norm2, L2norm, NormMax, LMaxnorm
@@ -69,4 +79,4 @@ def convergence_dt_plt(Smax, ds, dt, order):
 # Smax = 30.0  # Example Smax
 # order = 2   # Example order of accuracy
 
-# convergence_dt_plt(Smax, da, dt, order)
+# convergence_dt_plt(Smax, da, dt, order, "no_mortality")

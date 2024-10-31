@@ -21,8 +21,32 @@ def trapezoidal_rule(fx, dx):
     return result
 
 
+def total_pop_time(Tmax, dt, ds):
+        
+    for i in range(5):
+        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
+        time = np.arange(0, Tmax + dt, dt) 
+        n = len(time)
 
-def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order, folder):
+        totalPop_num = np.zeros(n)
+
+        for ii in range(n):
+
+            totalPop_num[ii] = trapezoidal_rule( data[ii,:],     ds[i])
+            # print('Numerical total pop  = ' + str(totalPop_num[ii]))
+
+
+        # time = np.arange(0, Tmax + dt, dt) 
+        print('for data' + str(i) )
+        plt.plot(time, totalPop_num)
+        plt.ylabel('Total Pop')
+        plt.xlabel('time')
+        plt.show()
+        
+
+
+
+def conservation_plt(Ntest, ds, c, Smax, Tmax, dt, order, folder, constant, hill_func):
     """Performs trapezoidal rule
     
     Args:
@@ -40,63 +64,75 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order, folder):
         L1norm  (array):    A list of 1-norm orders.
     """
 
-    totalPop_num = np.zeros([5]) 
-
-    # totalPop_sol = 0 # for advection with mu = 0 it will remain the same everywhere
-
     Norm1 = np.zeros([5])
     L1norm = np.zeros([5])
 
-    print(time[-1])
-
-    # Exact solution 
-    if c == 0:
-        totalPop_sol = -0.5 * np.pi**(0.5) * ( math.erf(5 - Smax) - math.erf(5) ) # solution
-    else:
-        totalPop_sol = -0.5 * np.pi**(0.5) * np.exp(-c * Tmax) * ( math.erf(Tmax + 5 - Smax) - math.erf(Tmax + 5) ) # solution
-
-        print('Exact total pop = ' + str(totalPop_sol))
 
     # Calculate the total population using trapezoidal rule
     for i in range(5):
+        totalPop_num = 0
+        totalPop_sol = 0
 
-        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
-        # print(data)
+        age = np.arange(0, Smax + ds[i], ds[i])      # array from 0 to age_max
 
-        totalPop_num[i] = trapezoidal_rule( data[-1,:],     ds[i])
 
-        # print( 'ds = ' + str(ds[i]) + ' & dt = ' + str(dt[i]) + ' : total pop = ' + str(totalPop_num[i]))
-        # np.set_printoptions(precision=15)
-        # print(data[-1,119:125])
-    
+        if constant == True:
+            sol = np.exp(-(age - ( Tmax + 5))**2) * np.exp( - c * Tmax)     # with advection -- CONSTANT
+        else:
+            if hill_func == True:
+                sol = np.exp(-(age - ( Tmax + 5))**2) * np.exp(- (30 * np.log(age**2 + 30**2) - 30 * np.log((age - Tmax)**2 +30**2))) # with advection -- hill function
+                # sol = np.exp(-(age - (Tend + 5))**2) / ((age**2 + 30**2) / ((age - Tend)**2 + 30**2))**30
 
-        # Nstep = int(Smax/ds[i]) + 1   # total number of steps
+            # else:
+            #     sol = np.exp(-(age - ( Tmax + 5))**2) * np.exp(- m * (age )* Tmax + 0.5 * m * (Tmax)**2)     # with advection -- NON CONSTANT
 
-        Norm1[i]    = np.abs( totalPop_num[i] - totalPop_sol )
 
-    for ii in range(0, Ntest - 1):
-        L1norm[ii+1] = np.log( Norm1[ii]   / Norm1[ii+1] )   / np.log( ds[ii] / ds[ii+1] )
+        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt')      # Load in relevant data.
+
+        # Calculate the total population 
+        totalPop_sol = trapezoidal_rule( sol,            ds[i])      # solution for different ds
+        print('Exact total pop      = ' + str(totalPop_sol))
+
+        totalPop_num = trapezoidal_rule( data[-1,:],     ds[i])
+        print('Numerical total pop  = ' + str(totalPop_num))
+
+
+        Norm1[i]    = np.abs( totalPop_num - totalPop_sol )
+        print('Norm of total pop    = ' + str(Norm1[i]))
+
+
+        # Calculate the order of convergence for norms
+        if i > 0:
+
+            # Check if Norm1 values are zero or NaN
+            if Norm1[i] == 0 or Norm1[i-1] == 0:
+                print(f"Warning: Zero error value at index {i} or {i-1}.")
+            if np.isnan(Norm1[i]) or np.isnan(Norm1[i-1]):
+                print(f"Warning: NaN error value at index {i} or {i-1}.")
+
+            # Calculate the order of convergence for norm
+            L1norm[i-1]   = np.log(Norm1[i-1]   / Norm1[i])   / np.log(ds[i-1] / ds[i])
 
 
     for i in range(0, 5):
 
-        print('For ds ='    + str( round( ds[i],10      ) ) )
-        print('Norm1 (abs error): '   + str( round( Norm1[i], 20  ) ) )
+        print('For ds ='                + str( ds[i] ) )
+        print('Norm1 (abs error): '     + str( Norm1[i] ))
         if i > 0:
-            print('L1 q order: ' + str( round( L1norm[i], 10  ) ) )
+            print('L1 q order: '        + str( L1norm[i] ) )
 
 
     # Plot absolute error oftotal population over time
     # plt.figure(figsize=(8, 6))  # Adjust the width and height as needed
-    plt.loglog(ds, Norm1, label='Norm1')
+    plt.loglog(ds, Norm1, label='Norm 1')
     plt.loglog(ds, ds**(order), label=f'order-{(order) }')
-    plt.xlabel('ds')
+    plt.xlabel(r'$\Delta a$')
     plt.ylabel('Absolute Error')
     plt.title('Error of Total Population')
     plt.legend()
 
-    # Convert ds array values to a string
-    ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
+    # # Convert ds array values to a string
+    # ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
     # # Save the plot to a file -- labels with da values and dt 
     # if isinstance(dt, np.ndarray):
@@ -122,3 +158,40 @@ def conservation_plt(Ntest, time, ds, c, Smax, Tmax, dt, order, folder):
     # plt.ylabel('total pop')
     # plt.title('Total Population at final time')
     # plt.show()
+
+# Test if convergence is working
+# Mesh options and dt
+# da = np.array([0.1, 0.05, 0.025, 0.0125, 0.00625])
+# # dt = 0.5 * da  # Time steps based on mesh size
+# dt = 0.0001
+
+# # Run the function with these parameters
+# Smax = 30.0  # Example Smax
+# order = 2   # Example order of accuracy
+# Tmax = 5
+
+# conservation_plt(5, da, 0.5, Smax, 5, dt, order, 'constant_mortality', True, False)
+
+# total_pop_time(Tmax, dt, da)
+
+
+
+
+
+
+
+
+        
+        # Exact solution 
+        # if c == 0:
+        # totalPop_sol = 0.5 * np.sqrt(np.pi) * (math.erf(Tmax + 5)  - math.erf(Tmax + 5 - Smax) ) # solution
+        # else:
+        # totalPop_sol = 0.5 * np.sqrt(np.pi) * np.exp(-c * Tmax) * ( math.erf(Smax + 5) - math.erf(Tmax + 5 - Smax)) # solution
+        
+        # if c == 0:
+        #     totalPop_sol = -0.5 * np.pi**(0.5) * ( math.erf(5 - Smax) - math.erf(5) ) # total population of initial condition
+        #     # totalPop_sol = -0.5 * np.pi**(0.5) * np.exp(-c * Tmax) * ( math.erf(Tmax + 5 - Smax) - math.erf(Tmax + 5) )
+        # else:
+        #     totalPop_sol = -0.5 * np.pi**(0.5) * np.exp(-c * Tmax) * ( math.erf(Tmax + 5 - Smax) - math.erf(Tmax + 5) ) # total population at end time 
+
+        # print('Exact total pop = ' + str(totalPop_sol))

@@ -51,6 +51,8 @@ def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folde
     L2norm   = ensure_size(test, L2norm)
     NormMax  = ensure_size(test, NormMax)
     LMaxnorm = ensure_size(test, LMaxnorm)
+    Norm1    = ensure_size(test, Norm1)
+    L1norm   = ensure_size(test, L1norm)
 
 
     # Combine the data into a list of tuples
@@ -66,13 +68,13 @@ def tabulate_conv(dt, ds, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folde
     ds_values_str = '_'.join(map(str, np.round(ds, 6) ))
     dt_values_str = '_'.join(map(str, np.round(ds, 6) ))
 
-    #     # save plots to folder
-    # if isinstance(dt, np.ndarray):
-    #     file2write=open('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '.txt' ,'w')
-    #     file2write.write(latex_table)
-    #     file2write.close()
-    # else:
-    #     # Save the plot to a file -- labels with da values and dt 
-    #     file2write=open('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + str(dt) + '.txt'  , 'w')
-    #     file2write.write(latex_table)
-    #     file2write.close()
+    # save plots to folder
+    if isinstance(dt, np.ndarray):
+        file2write=open('da_plot/' + folder + '/varied_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '.txt' ,'w')
+        file2write.write(latex_table)
+        file2write.close()
+    else:
+        # Save the plot to a file -- labels with da values and dt 
+        file2write=open('da_plot/' + folder + '/fixed_dt/lw-ex_plot_mu_' + str(c) + '_da_' + ds_values_str + '_dt_' + str(dt) + '.txt'  , 'w')
+        file2write.write(latex_table)
+        file2write.close()

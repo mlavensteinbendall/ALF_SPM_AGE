@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from function_mortality import mortality
 
-def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder):
+def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, hill_func, folder):
     """Calculates the convergence for varying ds and constant dt.
     
     Args:
@@ -20,13 +20,12 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder)
         NormMax (array):    A list of the infinity-norms.
         LMaxnorm(array):    A list of the order of the infinity-norms.
     """
+    print('Calculate convergence varying da and fixing dt (using analytic solution)')
 
     n = int(time_max/dt) + 1 # Time-step of comparison.
     Tend = n*dt # Get the associated timepoint value.
 
-    # Tend = time_max
     Ntest = len(da)
-    print(Ntest)
 
     Norm2 = np.zeros([Ntest])
     NormMax = np.zeros([Ntest])
@@ -51,8 +50,19 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder)
         data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
-        sol = np.exp(-(age - ( Tend + 5))**2) * np.exp( - mu * Tend)    # with advection 
-        # sol = np.exp(-(age - 5)**2) * np.exp( - mu * Tend)            # without advection
+        # sol = np.exp(-(age - ( Tend + 5))**2) * np.exp( - mu * Tend)    # with advection 
+        # sol = np.exp(-(age - 5)**2) * np.exp( - mu * Tend)            # without advection        
+        # sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(- (30 * np.log(age**2 + 30**2) - 30 * np.log((age - Tend)**2 +30**2))) # with advection -- hill function
+
+        if constant == True:
+            sol = np.exp(-(age - ( Tend + 5))**2) * np.exp( - mu * Tend)     # with advection -- CONSTANT
+        else:
+            if hill_func == True:
+                sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(- (30 * np.log(age**2 + 30**2) - 30 * np.log((age - Tend)**2 +30**2))) # with advection -- hill function
+                # sol = np.exp(-(age - (Tend + 5))**2) / ((age**2 + 30**2) / ((age - Tend)**2 + 30**2))**30
+
+            else:
+                sol = np.exp(-(age - ( Tend + 5))**2) * np.exp(- m * (age )* Tend + 0.5 * m * (Tend)**2)     # with advection -- NON CONSTANT
 
         
         # # plt data vs sol
@@ -97,8 +107,8 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder)
     # Convert ds array values to a string
     ds_values_str = '_'.join(map(str, da))
 
-    # # Save the plot to a file -- labels with da values and dt 
-    # plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str(c) + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
+    # Save the plot to a file -- labels with da values and dt 
+    # plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str("0_5") + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
 
     plt.show()
 
@@ -115,3 +125,13 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, folder)
     # # plt.ylim(-.2, 1.4)  # Set y-axis limits from 0 to 12
     # # plt.savefig('plots/pop_plot-time' + str(n) + '-ds_'+ str(ds_index) +'.png') # Save the plot
     # plt.show()
+
+da = np.array([0.1, 0.05, 0.025, 0.0125, 0.00625])
+dt = 0.0001
+
+# # Run the function with these parameters
+Smax = 30.0  # Example Smax
+Tmax = 5
+order = 2   # Example order of accuracy
+
+convergence_da_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, False, "test")

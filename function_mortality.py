@@ -20,10 +20,17 @@ def mortality(age_max, age, m, b, constant):
     else:
         # Apply mortality based on the linear equation: y = m * (age / age_max) + b
         # mu = m *(1 - np.cos(age/age_max * np.pi))
-        mu = m * age + b
+        # mu = m * age + b
+
+        # c1 = -1
+        # c2 = 10
+
+        # mu = 1 + c1 * (c2**2/(c2**2 + age**2))
 
         # mu = 1 + age * (20**2 / (20**2 + age**2))
         # mu = age/10 * (20**2 / (20**2 + age**2))
+
+        mu = (age / 15) * (30**2 / (30**2 + age**2))
 
         # mu = 0.1 + 0.9 * np.exp(- 1000000000 * np.exp(- 1 * age))
 
