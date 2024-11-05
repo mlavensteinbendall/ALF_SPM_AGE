@@ -167,3 +167,5 @@ da_plot/*
 videos/
 videos/*
 .DS_Store
+convergence/
+convergence/*

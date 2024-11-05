@@ -2,23 +2,24 @@ import numpy as np # Numpy for numpy
 import math
 import matplotlib.pyplot as plt
 from tabulate import tabulate
+from function_trapezoidal_rule import trapezoidal_rule
 
-def trapezoidal_rule(fx, dx):
-    """Performs trapezoidal rule
+# def trapezoidal_rule(fx, dx):
+#     """Performs trapezoidal rule
     
-    Args:
-        fx  (array):    A list of the population at different steps.
-        dx  (int):      The partition of steps.
+#     Args:
+#         fx  (array):    A list of the population at different steps.
+#         dx  (int):      The partition of steps.
         
-    Returns:
-        result  (array): Represents the time
-    """
+#     Returns:
+#         result  (array): Represents the time
+#     """
 
-    fx_sum = np.sum(fx[1:-1])
+#     fx_sum = np.sum(fx[1:-1])
 
-    result = dx * ( (fx[0] + fx[-1]) / 2 + fx_sum)
+#     result = dx * ( (fx[0] + fx[-1]) / 2 + fx_sum)
 
-    return result
+#     return result
 
 
 def total_pop_time(Tmax, dt, ds):
@@ -33,8 +34,7 @@ def total_pop_time(Tmax, dt, ds):
         for ii in range(n):
 
             totalPop_num[ii] = trapezoidal_rule( data[ii,:],     ds[i])
-            # print('Numerical total pop  = ' + str(totalPop_num[ii]))
-
+            print('Numerical total pop  = ' + str(totalPop_num[ii]))
 
         # time = np.arange(0, Tmax + dt, dt) 
         print('for data' + str(i) )

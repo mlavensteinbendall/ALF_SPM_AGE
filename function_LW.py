@@ -1,7 +1,8 @@
 import numpy as np # Numpy for numpy
+from function_reproduction import reproduction
 
 
-def LW_SPM(age, time, da, dt, mu):
+def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
     """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
     
     Args:
@@ -19,13 +20,14 @@ def LW_SPM(age, time, da, dt, mu):
     N = np.zeros([len(time),len(age)])
     N[0,:] = np.exp(-(age - 5)**2) 
 
-
     ## NUMERICAL SOLUTION 
     for t in range(0, len(time)-1):
 
         # Time Splitting
         Ntemp  = np.zeros([len(age)])
         Ntemp2 = np.zeros([len(age)])
+
+        # N[t, 0] = reproduction(N[t, :], repro_age_index, age, da)     # reproduction function 
 
 
         # Step 1 -- half time age (Aging)
@@ -68,8 +70,11 @@ def LW_SPM(age, time, da, dt, mu):
             N[t+1, a] = Ntemp2[a] - (dt/2) * first_centeral_diff + (dt**2/8) * second_centeral_diff
 
 
-        # # Set boundaries to zero
-        # N[t + 1, 0] = 0
+        # Set boundaries to zero
+        # print(type(N[t,:]))
+        N[t+1, 0] = reproduction(N[t, :], age, da, rep, constant_reproduction)     # reproduction function 
+        # print('boundary = ' + str(N[t+1,0]))
+        # print('type boundary = ', str(type(reproduction(N[t, :], repro_age_index, da)))) # returning float
         # N[t + 1, -1] = 0
                 
     return N

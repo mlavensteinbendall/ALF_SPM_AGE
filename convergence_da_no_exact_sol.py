@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def convergence_da_plt(Smax, da, dt, order, folder):
+def convergence_da_plt(Tmax, da, dt, order, folder):
 
-    print('Calculate convergence varying da and fixing dt (no analytic solution)')
+    print('Calculate convergence varying da and fixing dt (without using analytic solution)')
 
     Ntest    = len(da)
 
@@ -13,20 +13,26 @@ def convergence_da_plt(Smax, da, dt, order, folder):
     L2norm   = np.zeros([Ntest-2])
     LMaxnorm = np.zeros([Ntest-2])
 
+    # Time of interest to compare
+    # time = np.arange(0, Tmax + dt, dt)            # array from 0 to Tmax
+    # Ntime = len(time)                          # number of elements in time
+    # n = Ntime // 2                             # use the floor to find the center
+    n = int(Tmax / dt) // 2
+    # print(f"number of time-steps: {Tmax / dt}")   
+    # print(f"time-steps we are testing: {n}")   
+
     for i in range(0, Ntest-1):
 
         # Load in relevant data for both mesh sizes
-        data1 = np.loadtxt(f'da_convergence/num_{i}.txt') 
-        data2 = np.loadtxt(f'da_convergence/num_{i+1}.txt')
+        data1 = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i}.txt') 
+        data2 = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i+1}.txt')
 
-        # Time of interest to compare
-        tinterest = 2.5
-        n = int(tinterest/dt)     # Time step index for data1
-        # n2 = int(tinterest/da[i+1])   # Time step index for data2
+        print(data1.shape)
+        print(data2.shape)
 
         # Solve for L2 and L-max norms
-        Norm2[i] = np.sqrt(np.mean((data1[n, :] - data2[n,  ::2])**2))  # L2 norm
-        NormMax[i] = np.max(np.abs(data1[n, :]  - data2[n,  ::2]))       # L∞ norm
+        Norm2[i]   = np.sqrt(np.mean((data1[n, :]  - data2[n,  ::2])**2))  # L2 norm
+        NormMax[i] = np.max (np.abs(  data1[n, :]  - data2[n,  ::2]))      # L∞ norm
 
         # Calculate the order of convergence for norms
         if i > 0:
@@ -53,16 +59,14 @@ def convergence_da_plt(Smax, da, dt, order, folder):
 
     plt.xlabel(r'$\Delta a$')
     plt.ylabel('Norm')
-    plt.title('Convergence based on varying ' + r'$\Delta a$' + ' and fixing' + r'$\Delta t$')
+    plt.title('Numerical Convergence with varied ' + r'$\Delta a$' + ' and fixed ' + r'$\Delta t$')
     plt.legend()
 
     # Convert ds array values to a string
-    ds_values_str = '_'.join(map(str, np.round(da, 3) ))
-    dt_values_str = dt
+    ds_values_str = '_'.join(map(str, np.round(da, 5) ))
 
-
-    # Save the plot to a file -- labels with da values and dt 
-    # plt.savefig('da_plot/' + folder + '/varied_dt/lw-ex_plot_conv_mu_' + str(0) + '_da_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order)  +'.png', dpi=300)  
+    # Save the plot to a file -- labels with da values and dt  
+    plt.savefig(folder + '/plots/dt_' + str(dt) + '/da_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt) + '.png', dpi=300)
     plt.show()
 
     return Norm2, L2norm, NormMax, LMaxnorm
@@ -73,6 +77,35 @@ def convergence_da_plt(Smax, da, dt, order, folder):
 
 # # # Run the function with these parameters
 # Smax = 30.0  # Example Smax
+# Tmax = 5
 # order = 2   # Example order of accuracy
+# m = 0.5
 
-# convergence_da_plt(Smax, da, dt, order, "test")
+# testing_folder = 'mortality'
+
+# convergence_folder = 'fixed_dt'
+
+# constant = False    # True for constant mu, False for function mu
+# analytical_sol = True
+# hill_func = True
+# linear_slope_func = False
+
+# if constant == True:
+#     if m == 0 :
+#         function_folder = "no_mortality"
+
+#     else:
+#         function_folder = "constant_mortality"
+
+# elif hill_func == True:
+#     function_folder = "hill_mortality"
+
+# elif linear_slope_func == True:
+#     function_folder = "linear_mortality"
+
+# else:
+#     function_folder = "gompertz_mortality"
+
+# folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + convergence_folder
+
+# convergence_da_plt(Tmax, da, dt, order, folder)

@@ -1,26 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from function_trapezoidal_rule import trapezoidal_rule
 
-def trapezoidal_rule(fx, dx):
-    """Performs trapezoidal rule
-    
-    Args:
-        fx  (array):    A list of the population at different steps.
-        dx  (int):      The partition of steps.
-        
-    Returns:
-        result  (array): Represents the time
-    """
 
-    fx_sum = np.sum(fx[1:-1])
+def conservation_plt(da, dt, order, folder):
 
-    result = dx * ( (fx[0] + fx[-1]) / 2 + fx_sum)
-
-    return result
-
-def conservation_plt(Smax, da, dt, order, folder):
-
-    print('Calculate conservation (no analytic solution)')
+    print('Calculate conservation (without using an analytic solution)')
 
     Ntest    = len(da)
 
@@ -34,18 +19,19 @@ def conservation_plt(Smax, da, dt, order, folder):
     for i in range(0, Ntest-1):
 
         # Load in relevant data for both mesh sizes
-        data1 = np.loadtxt(f'da_convergence/num_{i}.txt') 
-        data2 = np.loadtxt(f'da_convergence/num_{i+1}.txt')
+        if isinstance(dt, np.ndarray):
+            data1 = np.loadtxt(f'{folder}/solutions/num_{i}.txt') 
+            data2 = np.loadtxt(f'{folder}/solutions/num_{i+1}.txt')
+        else:
+            data1 = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i}.txt') 
+            data2 = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i+1}.txt')
+
 
         # Time of interest to compare
-        # tinterest = 2.5
-        # n1 = int(tinterest/da[i])     # Time step index for data1
-        # n2 = int(tinterest/da[i+1])   # Time step index for data2
-
         totalPop_1[i] = trapezoidal_rule( data1[-1,:], da[i])           # using data at Tmax
         totalPop_2[i] = trapezoidal_rule( data2[-1,:], da[i+1])         # using data at Tmax
-        print('Numerical total pop using ' + r'$\Delta a$' + ' = ' + str(da[i]) +'  = '      + str(totalPop_1[i]))
-        print('Numerical total pop using ' + r'$\Delta a$' + ' = '  + str(da[i+1]) +'  = '    + str(totalPop_2[i]))
+        print('Numerical total pop using da = ' + str(da[i]) +'  = '      + str(totalPop_1[i]))
+        print('Numerical total pop using da = '  + str(da[i+1]) +'  = '    + str(totalPop_2[i]))
 
         # Solve for L2 and L-max norms
         Norm1[i] = np.abs( totalPop_1[i] - totalPop_2[i])  # L2 norm
@@ -71,7 +57,7 @@ def conservation_plt(Smax, da, dt, order, folder):
 
     plt.xlabel(r'$\Delta a$')
     plt.ylabel('Norm')
-    plt.title('Convergence based on varying ' + r'$\Delta a$' + ' and fixing' + r'$\Delta t$')
+    plt.title('Total Population Convergence')
     plt.legend()
 
     # Convert ds array values to a string
@@ -79,10 +65,13 @@ def conservation_plt(Smax, da, dt, order, folder):
 
     # if isinstance(dt, np.ndarray):
     if isinstance(dt, np.ndarray):
-        plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)  
+        # plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)
+        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+        plt.savefig(folder + '/plots/tot_pop_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt_values_str) + '.png', dpi=300)
 
     else:
-        plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)  
+        # plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)  
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/tot_pop_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt) + '.png', dpi=300)
  
     plt.show()
 
@@ -95,5 +84,35 @@ def conservation_plt(Smax, da, dt, order, folder):
 # # # Run the function with these parameters
 # Smax = 30.0  # Example Smax
 # order = 2   # Example order of accuracy
+# m=0.5
 
-# conservation_plt(Smax, da, dt, order, "test")
+
+# testing_folder = 'mortality'
+
+# convergence_folder = 'fixed_dt'
+
+# constant = True    # True for constant mu, False for function mu
+# analytical_sol = True
+# hill_func = False
+# linear_slope_func = False
+
+# if constant == True:
+#     if m == 0 :
+#         function_folder = "no_mortality"
+
+#     else:
+#         function_folder = "constant_mortality"
+
+# elif hill_func == True:
+#     function_folder = "hill_mortality"
+
+# elif linear_slope_func == True:
+#     function_folder = "linear_mortality"
+
+# else:
+#     function_folder = "gompertz_mortality"
+
+# folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + convergence_folder
+
+
+# conservation_plt(da, dt, order, folder)

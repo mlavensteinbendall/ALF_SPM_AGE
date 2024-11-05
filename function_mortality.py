@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def mortality(age_max, age, m, b, constant):
+def mortality(age_max, age, m, b, constant, linear_function, hill_function):
     """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
     
     Args:
@@ -13,46 +13,27 @@ def mortality(age_max, age, m, b, constant):
     Returns:
         mu       (array): Represents mortality rate at each age
     """
-    if constant:
+    if constant == True:
         # Apply constant mortality rate
         mu = np.full(len(age), m)  # Fill array with constant value of m (assuming m in [0,1])
 
     else:
+        if linear_function == True:
+            mu = m * age + b                                # linear function
+
+        elif hill_function == True:
+            mu = (age / 15) * (30**2 / (30**2 + age**2))    # hill function
+
+        else:
+            mu = np.exp(-6 * np.exp(-0.15 * age ))
+ 
         # Apply mortality based on the linear equation: y = m * (age / age_max) + b
-        # mu = m *(1 - np.cos(age/age_max * np.pi))
-        # mu = m * age + b
+        # mu = 0.5 *(1 - np.cos(age/age_max * np.pi))
 
         # c1 = -1
         # c2 = 10
 
         # mu = 1 + c1 * (c2**2/(c2**2 + age**2))
-
-        # mu = 1 + age * (20**2 / (20**2 + age**2))
-        # mu = age/10 * (20**2 / (20**2 + age**2))
-
-        mu = (age / 15) * (30**2 / (30**2 + age**2))
-
-        # mu = 0.1 + 0.9 * np.exp(- 1000000000 * np.exp(- 1 * age))
-
-        # mu = m * (age/age_max) + b
-        # mu = m * (age)/ (age+10000) + b
-        # mu = m * (age)/ (age+1000) + b
-        # mu =  np.exp( - age )
-
-        # mu = np.log(age+1)
-
-
-    # # clear figures 
-    # plt.clf()
-
-    # # Plot.
-    # plt.plot(age, mu)
-
-    # plt.xlabel('Age')
-    # plt.ylabel('Mortality Rate')
-    # plt.title('Mortality Rate based on Age')
-    # plt.legend()
-    # plt.show()
 
     return mu
 
