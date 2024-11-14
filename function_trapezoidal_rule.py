@@ -11,8 +11,8 @@ def trapezoidal_rule(fx, dx):
         result  (float): Represents the time
     """
     
-    fx_sum = np.sum(fx[1:-1])    # sum of the middle of the array
+    fx_sum = float(np.sum(fx[1:-1]))    # sum of the middle of the array
 
-    result = ( fx[0] + 2 * fx_sum + fx[-1] ) * dx / 2 
+    result = ( fx[0] + 2.0 * fx_sum + fx[-1] ) * dx / 2.0 
 
     return result

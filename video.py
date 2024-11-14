@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 # Load the relevant data
-population_data = np.loadtxt('da_convergence/num_4.txt') 
+# population_data = np.loadtxt('convergence/reproduction/no_mortality/linear_reproduction/varied_dt/solutions/num_0.txt') 
+population_data = np.loadtxt('/Users/mlavensteinbendall/Documents/ALF_SPM_AGE/convergence/reproduction/no_mortality/gaussian_reproduction/varied_dt/solutions/num_0.txt')
 
-age_max = 15
-da = 0.00625
+age_max = 30
+da = 0.1
 
 # Number of time steps is the number of outer elements
 time_steps = len(population_data)
@@ -17,7 +18,7 @@ age_groups = len(population_data[0])
 # Set up the figure and axis
 fig, ax = plt.subplots()
 ax.set_xlim(0, age_max)  # Rescale the x-axis to be from 0 to 15
-ax.set_ylim(0, np.max(population_data))  # Population numbers on the y-axis
+ax.set_ylim(-1, np.max(population_data))  # Population numbers on the y-axis
 line, = ax.plot([], [], lw=2)
 
 # Create an array of age labels from 0 to age_max
@@ -33,11 +34,11 @@ def update(frame):
     # X-axis: Corresponding age labels, Y-axis: Population numbers at the current time step
     y = population_data[frame]
     line.set_data(age_labels, y)  # Use the age labels for the x-values
-    ax.set_title(f"Distribution of Population at Time : {round(10 * frame * 0.00625 * 0.5, 0)}", fontsize=16)  # Update the title
+    ax.set_title(f"Distribution of Population at Time : {round(frame * da * 0.005, 0)}", fontsize=16)  # Update the title
     return line,
 
 # Create the animation
-ani = FuncAnimation(fig, update, frames=np.arange(0, time_steps), init_func=init, blit=False, interval=50)
+ani = FuncAnimation(fig, update, frames=np.arange(0, time_steps), init_func=init, blit=False, interval=0.000005)
 
 # Set axis labels
 plt.xlabel('Age', fontsize=14)
@@ -49,7 +50,7 @@ ax.tick_params(axis='y', labelsize=12)  # Set y-axis tick label size
 
 
 # Save the animation
-ani.save('population_dynamics_mu_0.gif', writer='pillow', fps=30)  # Save as GIF
+# ani.save('population_dynamics.gif', writer='pillow', fps=30)  # Save as GIF
 # ani.save('population_dynamics.mp4', writer='ffmpeg', fps=30)  # Uncomment to save as MP4
 
 

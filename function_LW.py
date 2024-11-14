@@ -2,7 +2,7 @@ import numpy as np # Numpy for numpy
 from function_reproduction import reproduction
 
 
-def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
+def LW_SPM(age, time, da, dt, mu, k, type_k):
     """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
     
     Args:
@@ -20,6 +20,16 @@ def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
     N = np.zeros([len(time),len(age)])
     N[0,:] = np.exp(-(age - 5)**2) 
 
+    # # smooth the boundary out
+    # smooth_boundary_condition = False
+    start_boundary = N[0,0] 
+    # M = 3000        # number of steps to smooth out 
+    # t_star = M * dt
+    # # t_star = dt / 2
+    # Le = 1
+
+
+
     ## NUMERICAL SOLUTION 
     for t in range(0, len(time)-1):
 
@@ -27,10 +37,8 @@ def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
         Ntemp  = np.zeros([len(age)])
         Ntemp2 = np.zeros([len(age)])
 
-        # N[t, 0] = reproduction(N[t, :], repro_age_index, age, da)     # reproduction function 
 
-
-        # Step 1 -- half time age (Aging)
+        # Step 1 -- half time-step to Age Population (Advection)
         for a in range(1,len(age)-1): 
 
             first_centeral_diff = 0
@@ -44,7 +52,7 @@ def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
             Ntemp[a] = N[t,a] - (dt/2) * first_centeral_diff + (dt**2/8) * second_centeral_diff
 
 
-        # Step 2 -- full time age (Death)
+        # Step 2 -- full time-step to decrease populations based on age (Death)
         for a in range(0,len(age)): 
         # for a in range(1,len(age)-1): 
 
@@ -56,7 +64,7 @@ def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
             Ntemp2[a] =   Ntemp[a] +  dt  * k2                    # update N for the full time step
 
 
-        # age 3 -- half time age (Aging)
+        # age 3 -- half time-step to Age Population (Advection)
         for a in range(1,len(age)-1):
 
             first_centeral_diff = 0
@@ -70,11 +78,7 @@ def LW_SPM(age, time, da, dt, mu, rep, constant_reproduction):
             N[t+1, a] = Ntemp2[a] - (dt/2) * first_centeral_diff + (dt**2/8) * second_centeral_diff
 
 
-        # Set boundaries to zero
-        # print(type(N[t,:]))
-        N[t+1, 0] = reproduction(N[t, :], age, da, rep, constant_reproduction)     # reproduction function 
-        # print('boundary = ' + str(N[t+1,0]))
-        # print('type boundary = ', str(type(reproduction(N[t, :], repro_age_index, da)))) # returning float
-        # N[t + 1, -1] = 0
+        # Boundary Condition
+        N[t+1, 0] = reproduction(N[t, :], age, da, k, type_k)
                 
     return N

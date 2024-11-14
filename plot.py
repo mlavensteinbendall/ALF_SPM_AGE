@@ -1,120 +1,123 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from function_trapezoidal_rule import trapezoidal_rule
-
-## INITIAL CONDITIONS
-Amax = 30       # max age
-Tmax = 5     # max time
-order = 2       # order of method
-Ntest = 5       # number of cases
+from function_reproduction import k_ind
 
 
-# Mortality set up
-m = 1       #1/30            # constant for mux
-b = 0              # y-intercept
-constant_mortality = True   # True for constant mu, False for function mu
-analytical_sol = False
-hill_func_mortality = False
-linear_slope_func_mortality = False
+def plt_mortality_func(age, mu, dt, folder):
 
-# Reproduction set up
-rep = 1
-constant_reproduction = True
-linear_reproduction = False
+    print('Plot mortality function')
 
-# testing_folder = 'mortality'
-testing_folder = 'reproduction'
+    plt.plot(age, mu)
+    plt.xlabel('Age')
+    plt.ylabel('Mortality Rate')
+    plt.title('Age-Specific Mortality Rate')
 
-if constant_mortality == True:
-    if m == 0 :
-        function_folder = "no_mortality"
+    if isinstance(dt, np.ndarray): 
+        plt.savefig(folder + '/plots/mortality_plot.png', dpi=300)
+    else:
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/mortality_plot.png', dpi=300)
+
+    plt.close()
+
+def plt_reproduction_func(age, k, type_k, dt, folder):
+
+    print('Plot mortality function')
+
+    reproduction_rate = k_ind(age, k, type_k)
+
+
+    plt.plot(age, reproduction_rate)
+    plt.xlabel('Age')
+    plt.ylabel('Reproduction Rate')
+    plt.title('Age-Specific Reproduction Rate')
+
+    if isinstance(dt, np.ndarray): 
+        plt.savefig(folder + '/plots/reproduction_plot.png', dpi=300)
+    else:
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/reproduction_plot.png', dpi=300)
+
+    plt.close()
+    
+
+def plt_total_pop(data, time, da, dt, index, folder):
+
+    print('Plot total population')
+
+    totalPop = np.zeros(len(time))
+
+    for i in range(len(time)):
+        totalPop[i] = trapezoidal_rule( data[i,:], da) 
+
+    plt.plot(time, totalPop)
+    plt.xlabel('Time')
+    plt.ylabel('Population')
+    plt.title('Total Population over Time')
+
+    if isinstance(dt, np.ndarray):
+        plt.savefig(folder + '/plots/tot_pop_over_time_for_da_' + str(da) + '_dt_' + str(dt[index]) + '.png', dpi=300)
 
     else:
-        function_folder = "constant_mortality"
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/tot_pop_over_time_for_da_' + str(da) + '_dt_' + str(dt) + '.png', dpi=300)
 
-elif hill_func_mortality == True:
-    function_folder = "hill_mortality"
-
-elif linear_slope_func_mortality == True:
-    function_folder = "linear_mortality"
-
-else:
-    function_folder = "gompertz_mortality"
-
-if testing_folder == 'reproduction':
-
-    if constant_reproduction == True:
-        if rep == 0:
-            function_folder = function_folder + '/' + 'no_reproduction'
-            
-        else:
-            function_folder = function_folder + '/' + 'constant_reproduction/rep_' + str(rep)
-
-    elif linear_reproduction == True:
-        function_folder = function_folder + '/' + 'linear_reproduction'
+    plt.close()
 
 
 
+def plt_boundary_condition(data, time, da, dt, index, folder):
 
-# need to chose da and dt so that the last value in the array are Amax and Tmax
-da = np.zeros([Ntest]) # order smallest to largest
+    print('Plot boundary condition')
 
-# # vary da and dt cases:
-da[0] = 0.1
-da[1] = 0.05
-da[2] = 0.025
-da[3] = 0.0125
-da[4] = 0.00625
+    plt.plot(time, data[:,0])
+    plt.xlabel('Time')
+    plt.ylabel('Number of Newborns')
+    plt.title('Boundary Condition')
 
+    if isinstance(dt, np.ndarray):
+        plt.savefig(folder + '/plots/boundary_condition_for_da_' + str(da) + '_dt_' + str(dt[index]) + '.png', dpi=300)
 
-dt = np.zeros([Ntest]) # order smallest to largest
+    else:
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/boundary_condition_for_da_' + str(da) + '_dt_' + str(dt) + '.png', dpi=300)
 
-dt = 0.5 * da
-# dt = 0.01
-# dt = 0.001
-# dt = 0.0001
-# dt = 0.00001
-
-if isinstance(dt, np.ndarray):
-    convergence_folder = 'varied_dt'
-
-else:
-    convergence_folder = 'fixed_dt'
+    plt.close()
 
 
-folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + convergence_folder
+
+def plt_numerical_sol(analytical_sol, sol, data, age, time, da, dt, Ntime, index, folder):
+
+    # COMPARTISION PLOT BTWN NUMERICAL AND ANALYTICAL
+    # get inidices of initial, middle, and last time step
+    plot_indices = [0, Ntime // 2, Ntime - 1]
+
+    plt.close()
+    # plot numerical and analytical solution
+    for t_index in plot_indices:
+        if analytical_sol == True: 
+            plt.plot(age, sol [t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='*')     # analytical 
+        plt.plot(age, data[t_index, :], label=f'Numerical at time  {round(time[t_index], 1)  }', linestyle='-')    # numerical 
+
+    plt.axhline(y=1, color='r', linestyle='--', label='y=1')
+    plt.xlabel('Age')
+    plt.ylabel('Population')
+    if isinstance(dt, np.ndarray):
+        # plt.title(f'Population by Step when $\Delta a$ = {da[i] } and $\Delta t$ = {dt[i] }')
+        plt.title('Age Distribution of Population (' + r'$\Delta a$' + ' = ' + str(da[index]) + ', ' + r'$\Delta t$' + ' = ' + str(dt[index]) + ')')
+    else:
+        plt.title('Age Distribution of Population (' + r'$\Delta a$' + ' = ' + str(da[index]) + ', ' + r'$\Delta t$' + ' = ' + str(dt) + ')')
+        # plt.title(f'Population by Step when' + r'$\Delta a$' + f' = {da[i] } and ' + r'$\Delta t' + f' = {dt }')
+    plt.legend()
+
+    # save plots to folder
+    if isinstance(dt, np.ndarray):
+
+        plt.savefig(folder + '/plots/num_' + str(index) + '_da_' + str(da[index]) + '_dt_' + str(round(dt[index],5)) + '.png', dpi=300)
+    else:
+
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/num_' + str(index) + '_da_' + str(da[index]) + '_dt_' + str(dt) + '.png', dpi=300)
+    
+    # plt.show()        # show plot
+
+    plt.close()
 
 
-data = np.loadtxt(f'{folder}/solutions/num_0.txt') 
-time = np.arange(0,Tmax + dt[0], dt[0])     # array from 0 to Tmax
-age = np.arange(0,Amax + da[0], da[0])     # array from 0 to Tmax
-# print(time[8])
-# plt.plot(age, data[8,:])
-# plt.xlabel('age')
-# plt.ylabel('population')
-# plt.show()
-
-print('Population       at (0,0) :   ' + str(data[0,0]))
-print('Total Population at (0,a) :   ' + str(trapezoidal_rule(data[0,:], da[0])))
-print('Population       at (1,0) :   ' + str(data[1,0]))
-print('Total Population at (1,a) :   ' + str(trapezoidal_rule(data[1,:], da[0])))
-print('Population       at (2,0) :   ' + str(data[2,0]))
-print('Total Population at (2,a) :   ' + str(trapezoidal_rule(data[2,:], da[0])))
-print('Population       at (3,0) :   ' + str(data[3,0]))
-print('Total Population at (3,a) :   ' + str(trapezoidal_rule(data[3,:], da[0])))
-print('Population       at (4,0) :   ' + str(data[4,0]))
-print('Total Population at (4,a) :   ' + str(trapezoidal_rule(data[4,:], da[0])))
-print('Population       at (5,0) :   ' + str(data[5,0]))
-print('Total Population at (5,a) :   ' + str(trapezoidal_rule(data[5,:], da[0])))
-print('Population       at (6,0) :   ' + str(data[6,0]))
-print('Total Population at (6,a) :   ' + str(trapezoidal_rule(data[6,:], da[0])))
-print('Population       at (7,0) :   ' + str(data[7,0]))
-print('Total Population at (7,a) :   ' + str(trapezoidal_rule(data[7,:], da[0])))
-print('Population       at (8,0) :   ' + str(data[8,0]))
-print('Total Population at (8,a) :   ' + str(trapezoidal_rule(data[8,:], da[0])))
-
-plt.plot(time, data[:,0])
-plt.xlabel('time')
-plt.ylabel('population')
-plt.show()
 

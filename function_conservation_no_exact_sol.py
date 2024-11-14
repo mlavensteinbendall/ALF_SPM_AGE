@@ -74,6 +74,7 @@ def conservation_plt(da, dt, order, folder):
         plt.savefig(folder + '/plots/dt_' + str(dt) + '/tot_pop_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt) + '.png', dpi=300)
  
     plt.show()
+    plt.close()
 
     return Norm1, L1norm
 

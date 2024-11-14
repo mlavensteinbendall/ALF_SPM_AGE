@@ -14,8 +14,7 @@ from convergence_da_no_exact_sol    import convergence_da_plt
 # from convergence_da         import convergence_da_plt
 from print_tab_conv                 import tabulate_conv
 from function_LW                    import LW_SPM
-from old.RK2_test                   import RK2_function
-from function_reproduction          import reproduction
+from plot                           import plt_mortality_func, plt_reproduction_func, plt_total_pop, plt_boundary_condition, plt_numerical_sol
 
 from function_mortality import mortality
 
@@ -24,13 +23,14 @@ start = timeit.default_timer()
 
 ## INITIAL CONDITIONS
 Amax = 30       # max age
-Tmax = 5     # max time
+# Tmax = 5     # max time
+Tmax = 10
 order = 2       # order of method
 Ntest = 5       # number of cases
 
 
 # Mortality set up
-m = 0       #1/30            # constant for mux
+m = 0 #1/30            # constant for mux
 b = 0              # y-intercept
 constant_mortality = True   # True for constant mu, False for function mu
 analytical_sol = False
@@ -38,9 +38,43 @@ hill_func_mortality = False
 linear_slope_func_mortality = False
 
 # Reproduction set up
-rep = 1
-constant_reproduction = True
+k = 2
+constant_reproduction = False
 linear_reproduction = False
+gaussian_reproduction = False
+test_reproduction = True
+
+
+# need to chose da and dt so that the last value in the array are Amax and Tmax
+da = np.zeros([Ntest]) # order smallest to largest
+
+# # vary da and dt cases:
+da[0] = 0.1
+da[1] = 0.05
+da[2] = 0.025
+da[3] = 0.0125
+da[4] = 0.00625
+
+# da[0] = 0.01
+# da[1] = 0.005
+# da[2] = 0.0025
+# da[3] = 0.00125
+# da[4] = 0.000625
+
+
+dt = np.zeros([Ntest]) # order smallest to largest
+
+# dt[0] = 0.5 * 0.1
+# dt[1] = 0.5 * 0.05
+# dt[2] = 0.5 * 0.025
+# dt[3] = 0.5 * 0.0125
+# dt[4] = 0.5 * 0.00625
+
+dt = 0.5 * da
+# dt = 0.01
+# dt = 0.001
+# dt = 0.0001
+
 
 # testing_folder = 'mortality'
 testing_folder = 'reproduction'
@@ -61,59 +95,32 @@ elif linear_slope_func_mortality == True:
 else:
     function_folder = "gompertz_mortality"
 
+type_k = "none"
+
 if testing_folder == 'reproduction':
 
     if constant_reproduction == True:
-        if rep == 0:
+        if k == 0:
             function_folder = function_folder + '/' + 'no_reproduction'
+            type_k = 'no_reproduction'
 
         else:
-            function_folder = function_folder + '/' + 'constant_reproduction/rep_' + str(rep)
+            function_folder = function_folder + '/' + 'constant_reproduction/rep_' + str(k)   # using a step function
+            type_k = 'constant_reproduction'
 
     elif linear_reproduction == True:
-        function_folder = function_folder + '/' + 'linear_reproduction'
+        function_folder = function_folder + '/' + 'linear_reproduction'                         # using a step function
+        type_k = 'linear_reproduction'
 
+    elif gaussian_reproduction == True:
+        function_folder = function_folder + '/' + 'gaussian_reproduction'
+        type_k = 'gaussian_reproduction' 
 
+    elif test_reproduction == True:
+        function_folder = function_folder + '/' + 'test'
 
+print(function_folder)
 
-# need to chose da and dt so that the last value in the array are Amax and Tmax
-da = np.zeros([Ntest]) # order smallest to largest
-
-# # vary da and dt cases:
-da[0] = 0.1
-da[1] = 0.05
-da[2] = 0.025
-da[3] = 0.0125
-da[4] = 0.00625
-
-# da[0] = 0.001
-# da[1] = 0.0005
-# da[2] = 0.00025
-# da[3] = 0.000125
-# da[4] = 0.0000625
-
-# da[0] = 1
-# da[1] = 0.5
-# da[2] = 0.25
-# da[3] = 0.125
-# da[4] = 0.0625
-
-
-dt = np.zeros([Ntest]) # order smallest to largest
-
-# dt[0] = 0.5 * 0.1
-# dt[1] = 0.5 * 0.05
-# dt[2] = 0.5 * 0.025
-# dt[3] = 0.5 * 0.0125
-# dt[4] = 0.5 * 0.00625
-
-# dt = 0.5 * da
-# dt = 0.01
-# dt = 0.001
-# dt = 0.0001
-dt = 0.000001
-# da = 0.5 * da
-# dt = 0.5 * dt
 
 if isinstance(dt, np.ndarray):
     convergence_folder = 'varied_dt'
@@ -134,23 +141,12 @@ for i in range(len(da)):
 
     # initalize arrays
     age = np.arange(0, Amax + da[i], da[i])       # array from 0 to Amax
+    # print(age)
     Nage = len(age)                               # number of elements in age
     print("age:", age[-1])                        # check that last element is Amax
 
     mu = np.zeros(Nage)
     mu = mortality(Amax, age, m, b, constant_mortality, linear_slope_func_mortality, hill_func_mortality)
-
-    if i == 0:
-        plt.plot(age, mu)
-        plt.xlabel('Age')
-        plt.ylabel('Mortality Rate')
-        plt.title('Age-Specific Mortality Rate')
-        if isinstance(dt, np.ndarray): 
-            plt.savefig(folder + '/plots/mortality_plot.png', dpi=300)
-        else:
-            plt.savefig(folder + '/plots/dt_' + str(dt) + '/mortality_plot.png', dpi=300)
-        # plt.show()
-        plt.close()
 
 
     ## NUMERICAL SOLUTION 
@@ -169,8 +165,9 @@ for i in range(len(da)):
         print('CFL: ' + str(round(dt[i]/da[i], 5)))   
 
         # calculate solution
-        data = LW_SPM(age, time, da[i], dt[i], mu, rep, constant_reproduction)              # lax-wendroff method
-    
+        data = LW_SPM(age, time, da[i], dt[i], mu, k, type_k)              # lax-wendroff method
+
+            
     # ELSE da is varied and dt is constant, do this ------------------------------------------------
     else:
         # initalize arrays
@@ -185,7 +182,7 @@ for i in range(len(da)):
         print('CFL: ' + str(round(dt/da[i], 5)))
 
         # calculate solution
-        data = LW_SPM(age, time, da[i], dt, mu, rep, constant_reproduction)                 # lax-wendroff method
+        data = LW_SPM(age, time, da[i], dt, mu, k, type_k)                 # lax-wendroff method
 
 
     # Save data to a file --------------------------------------------------------------------------
@@ -195,42 +192,31 @@ for i in range(len(da)):
     else:
         np.savetxt(folder + '/solutions/dt_' + str(dt) + '/num_'+ str(i) +'.txt', data)     # save data to file 
 
-    print('Loop ' + str(i) + ' Complete.')                      # progress update, loop end
+    if i == 0:
+
+        # Plot the mortality function
+        plt_mortality_func(age, mu, dt, folder)
 
 
-    
+        # Plot the reproduction function
+        plt_reproduction_func(age, k, type_k, dt, folder)
+
+        # Plot the total population
+        plt_total_pop(data, time, da[i], dt, i, folder)
+
+        # Plot the boundary condition
+        plt_boundary_condition(data, time, da[i], dt, i, folder)
+
+
+
+    ## ANALYTICAL SOLUTION     
     # calculate the analytical solution for every age at time t
     for i_t in range(0, len(time)):
-        # Calculate the analytical solution
 
-        # for i_a in range(0, len(age)):
+        # initialize analytical solution matrix
+        sol = np.zeros([len(time),len(age)])
 
-            # if constant == True:
-            #     sol[i_t, i_a] = np.exp(-(age[i_a] - ( time[i_t] + 5))**2) * np.exp( - mu[i_a] * time[i_t])     # with advection -- CONSTANT
-
-            # elif hill_func == True:
-            #     sol[i_t,:] = np.exp(-(age - ( time[i_t] + 5))**2) * np.exp(- (30 * np.log(age**2 + 30**2) - 30 * np.log((age - time[i_t])**2 +30**2))) # with advection -- hill function
-
-            # elif linear_slope_func == True:
-            #     sol[i_t,:] = np.exp(-(age - ( time[i_t] + 5))**2) * np.exp(- m * (age )* time[i_t] + 0.5 * m * (time[i_t])**2)     # with advection -- NON CONSTANT linear slope
-
-        # if i_t > 0:
-            # print('type = ' + str(type(sol[i_t, :])))
-            # print('shape = ' + str((sol[i_t, :]).shape))
-            # print(type(sol[i_t, 0]))
-            # print('beepbeep' + str(type(reproduction(sol[i_t, :], 0, da) )))
-            # temp = sol[i_t, :]
-            # print(temp.shape)
-            # sol[, 0] = reproduction(temp, 0, da) 
-            # print(type(sol[i_t,0]))
-            # print("type of boundry:" + str(type(reproduction(temp, 0, da) )))
-        
-        
-        ## ANALYTICAL SOLUTION 
         if analytical_sol == True:
-
-             # initialize analytical solution matrix
-            sol = np.zeros([len(time),len(age)])
 
             if constant_mortality == True:
                 sol[i_t,:] = np.exp(-(age - ( time[i_t] + 5))**2) * np.exp( - mu * time[i_t])     # with advection -- CONSTANT
@@ -241,49 +227,14 @@ for i in range(len(da)):
             elif linear_slope_func_mortality == True:
                 sol[i_t,:] = np.exp(-(age - ( time[i_t] + 5))**2) * np.exp(- m * (age )* time[i_t] + 0.5 * m * (time[i_t])**2)     # with advection -- NON CONSTANT linear slope
 
+    plt_numerical_sol(analytical_sol, sol, data, age, time, da, dt, Ntime, i, folder)
 
-    # COMPARTISION PLOT BTWN NUMERICAL AND ANALYTICAL
-    # get inidices of initial, middle, and last time step
-    plot_indices = [0, Ntime // 2, Ntime - 1]
-
-    plt.close()
-    # plot numerical and analytical solution
-    for t_index in plot_indices:
-        if analytical_sol == True: # check if there are non-zero elements in the array (if it's all zeros, then there was no analytical solution to solve)
-            plt.plot(age, sol [t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='-')     # analytical 
-        plt.plot(age, data[t_index, :], label=f'Numerical at time  {round(time[t_index], 1)  }', linestyle='--')    # numerical 
-
-    plt.axhline(y=1, color='r', linestyle='--', label='y=1')
-    plt.xlabel('Age')
-    plt.ylabel('Population')
-    if isinstance(dt, np.ndarray):
-        # plt.title(f'Population by Step when $\Delta a$ = {da[i] } and $\Delta t$ = {dt[i] }')
-        plt.title('Age Distribution of Population (' + r'$\Delta a$' + ' = ' + str(da[i]) + ', ' + r'$\Delta t$' + ' = ' + str(dt[i]) + ')')
-    else:
-        plt.title('Age Distribution of Population (' + r'$\Delta a$' + ' = ' + str(da[i]) + ', ' + r'$\Delta t$' + ' = ' + str(dt) + ')')
-        # plt.title(f'Population by Step when' + r'$\Delta a$' + f' = {da[i] } and ' + r'$\Delta t' + f' = {dt }')
-    plt.legend()
-
-    # save plots to folder
-    if isinstance(dt, np.ndarray):
-
-        plt.savefig(folder + '/plots/num_' + str(i) + '_da_' + str(da[i]) + '_dt_' + str(round(dt[i],5)) + '.png', dpi=300)
-    else:
-
-        plt.savefig(folder + '/plots/dt_' + str(dt) + '/num_' + str(i) + '_da_' + str(da[i]) + '_dt_' + str(dt) + '.png', dpi=300)
-    
-    # plt.show()        # show plot
-
-    # # error check -- using this with Shilpa's matlab code to make sure we are getting the same values
-    # print(data[-1, 99:109])
+    print('Loop ' + str(i) + ' Complete.')                      # progress update, loop end
 
 
 # END LOOP +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-
-# Pervents corrupting convergence plot
-plt.close()
 
 ## CONVERGENCE ------------------------------------------------------------------------------------------
 # Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
@@ -297,7 +248,6 @@ else:
 
 ## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
 # Checks conservation, returns norm and order of conservation
-plt.close()
 # Norm1, L1norm = conservation_plt(Ntest, da, m, Amax, Tmax, dt, order, folder, constant, hill_func)   # only works for constant 
 Norm1, L1norm = conservation_plt(da, dt, order, folder)
 
