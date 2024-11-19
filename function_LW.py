@@ -28,14 +28,16 @@ def LW_SPM(age, time, da, dt, mu, k, type_k):
     # # t_star = dt / 2
     # Le = 1
 
-
+    # Time Splitting
+    Ntemp  = np.zeros([len(age)])
+    Ntemp2 = np.zeros([len(age)])
 
     ## NUMERICAL SOLUTION 
     for t in range(0, len(time)-1):
 
         # Time Splitting
-        Ntemp  = np.zeros([len(age)])
-        Ntemp2 = np.zeros([len(age)])
+        Ntemp  = N[t,:]
+        Ntemp2 = N[t,:]
 
 
         # Step 1 -- half time-step to Age Population (Advection)

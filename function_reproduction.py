@@ -14,17 +14,17 @@ def reproduction(N, age, da, k, type_k):
 
     reproduction_rate = np.full(len(age), 0.0)
 
-    # reproduction_rate = k_ind(age, k, type_k)
+    reproduction_rate = k_ind(age, k, type_k)
 
-    for i in range(0,len(age)):
-        if age[i] > 10:
-            p = 2
-            q = 400
-            b = 8.0/3.0
+    # for i in range(0,len(age)):
+    #     if age[i] > 10:
+    #         p = 2
+    #         q = 400
+    #         b = 8.0/3.0
 
-            total_pop = trapezoidal_rule(N, da)
+    #         total_pop = trapezoidal_rule(N, da)
 
-            reproduction_rate[i] = (b * np.exp(-age[i] / 10.0) * q**p) / (q**p + total_pop**p)
+    #         reproduction_rate[i] = (b * np.exp(-age[i] / 10.0) * q**p) / (q**p + total_pop**p)
 
     return trapezoidal_rule(reproduction_rate * N, da)
 

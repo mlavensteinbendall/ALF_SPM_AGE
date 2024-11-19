@@ -82,7 +82,6 @@ def plt_boundary_condition(data, time, da, dt, index, folder):
     plt.close()
 
 
-
 def plt_numerical_sol(analytical_sol, sol, data, age, time, da, dt, Ntime, index, folder):
 
     # COMPARTISION PLOT BTWN NUMERICAL AND ANALYTICAL
@@ -93,7 +92,7 @@ def plt_numerical_sol(analytical_sol, sol, data, age, time, da, dt, Ntime, index
     # plot numerical and analytical solution
     for t_index in plot_indices:
         if analytical_sol == True: 
-            plt.plot(age, sol [t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle='*')     # analytical 
+            plt.plot(age, sol [t_index, :], label=f'Analytical at time {round(time[t_index], 1)  }', linestyle=':')     # analytical 
         plt.plot(age, data[t_index, :], label=f'Numerical at time  {round(time[t_index], 1)  }', linestyle='-')    # numerical 
 
     plt.axhline(y=1, color='r', linestyle='--', label='y=1')

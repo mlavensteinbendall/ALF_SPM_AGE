@@ -38,7 +38,7 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, m, b, constant, folder):
         Nstep = len(step)                           # number of elements in step
 
         mu = np.zeros(Nstep)
-        mu = mortality(Smax, step, m, b, constant)
+        mu = mortality(Smax, step, m, b, constant, False, False)
         # print(mu)
 
         Ntime = int(Tmax/dt[i])     # Time-step of comparison.
@@ -50,14 +50,14 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, m, b, constant, folder):
 
 
         # Numerical solution -- download relevent data
-        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') 
+        data = np.loadtxt(f'{folder}/solutions/num_{i}.txt') 
 
         # Analyticial solution -- changes for what ds is
-        # sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-mu * Tend)     # with advection -- constant
+        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(-mu * Tend)     # with advection -- constant
         # sol = np.exp(-(step - ( Tend + 5))**2) * np.exp( - m *  step  * Tend + m * Tend**2 * 0.5)     # with advection -- non-constant
         # sol = np.exp(-(step - 5)**2) * np.exp( - mu * Tend)             # without advection
 
-        sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(- m * step * Tend + 0.5 * m * (Tend)**2)     # with advection -- NON CONSTANT - slope
+        # sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(- m * step * Tend + 0.5 * m * (Tend)**2)     # with advection -- NON CONSTANT - slope
 
         # sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(- (Tend + 200 * np.log(step**2 + 400) - 200 * np.log((step - Tend)**2 +400))) # hill function
         # sol = np.exp(-(step - ( Tend + 5))**2) * np.exp(- (20 * np.log(step**2 + 400) - 20 * np.log((step - Tend)**2 +400)))  # hill function
@@ -89,25 +89,24 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, m, b, constant, folder):
             print(' ')
 
 
-    plt.clf()
-
     plt.loglog(dt, Norm2, label='Norm2')
     plt.loglog(dt, NormMax, label='NormMax')
     plt.loglog(dt, dt**(order), label=f'order-{order }')
 
     plt.xlabel(r'$\Delta t$')
     plt.ylabel('Norm')
-    plt.title('Convergence based on varying ' + r'$\Delta s$' + ' and ' + r'$\Delta t$')
+    plt.title('Numerical Convergence with varied ' + r'$\Delta a$' + ' and ' + r'$\Delta t$')
     plt.legend()
 
     # Convert ds array values to a string
     ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
 
+
     # Save the plot to a file -- labels with da values and dt 
-    # plt.savefig('da_plot/' + folder + '/varied_dt/lw-ex_plot_conv_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '_order_'+ str(order)  +'.png', dpi=300)  
- 
+    plt.savefig(folder + '/plots/dt_convergence_exact_for_da_' + str(ds_values_str) + '_dt_' + str(dt_values_str) + '.png', dpi=300)
     plt.show()
+    plt.close()
 
     return Norm2, L2norm, NormMax, LMaxnorm
 
@@ -125,3 +124,43 @@ def convergence_dt_plt(Smax, Tmax, ds, dt, order, m, b, constant, folder):
 # constant = False
 
 # convergence_dt_plt(Smax, Tmax, da, dt, order, m, b, constant, 'folder')
+
+
+# from function_conservation import conservation_plt
+# from print_tab_conv import tabulate_conv
+
+# da = np.array([0.1, 0.05, 0.025, 0.0125, 0.00625])
+# dt = 0.5 * da  # Time steps based on mesh size
+
+# # # Run the function with these parameters
+# Smax = 30.0  # Example Smax
+# Tmax = 5
+# order = 2   # Example order of accuracy
+
+# # convergence_da_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, False, "test")
+
+# testing_folder = "mortality"
+# function_folder = "constant_mortality"
+
+# if isinstance(dt, np.ndarray):
+#     convergence_folder = 'varied_dt'
+
+# else:
+#     convergence_folder = 'fixed_dt'
+
+
+# folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + convergence_folder
+
+# Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, folder)
+#     # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Tmax, da, dt, order, folder)
+
+
+# ## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
+# # Checks conservation, returns norm and order of conservation
+# # Norm1, L1norm = conservation_plt(Ntest, da, m, Amax, Tmax, dt, order, folder, constant, hill_func)   # only works for constant 
+# Norm1, L1norm = conservation_plt(da, 0.5, Smax, Tmax, dt, 2, folder, True, False)
+
+
+# ## PRINT NORMS --------------------------------------------------------------------------------------------
+# # print latex table
+# tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder)

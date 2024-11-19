@@ -41,13 +41,14 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, hill_fu
         Nage = len(age)                                 # number of elements in age
 
         mu = np.zeros(Nage)
-        mu = mortality(age_max, age, m, b, constant)
+        mu = mortality(age_max, age, m, b, constant, False, False)
 
         data = np.zeros([int(time_max/da[i]), Nage])    # initialize matrix for numerical solution
         sol = np.zeros([Nage])                          # initialize array for analytical solution
 
         # Numerical solution -- download relevent data
-        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
+        data = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i}.txt') 
+        # data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
 
         # Analyticial solution -- changes for what ds is
         # sol = np.exp(-(age - ( Tend + 5))**2) * np.exp( - mu * Tend)    # with advection 
@@ -108,9 +109,9 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, hill_fu
     ds_values_str = '_'.join(map(str, da))
 
     # Save the plot to a file -- labels with da values and dt 
-    # plt.savefig('da_plot/' + folder + '/fixed_dt/lw-ex_plot_conv_mu_'+ str("0_5") + '_ds_'+ ds_values_str + f'_dt_{dt }' + '.png', dpi=300)  
-
+    plt.savefig(folder + '/plots/dt_' + str(dt) + '/da_convergence_exact_for_da_' + str(ds_values_str) + '_dt_' + str(dt) + '.png', dpi=300)
     plt.show()
+    plt.close()
 
     return Norm2, L2norm, NormMax, LMaxnorm
 
@@ -126,6 +127,9 @@ def convergence_da_plt(age_max, time_max, da, dt, order, m, b, constant, hill_fu
     # # plt.savefig('plots/pop_plot-time' + str(n) + '-ds_'+ str(ds_index) +'.png') # Save the plot
     # plt.show()
 
+from function_conservation import conservation_plt
+from print_tab_conv import tabulate_conv
+
 da = np.array([0.1, 0.05, 0.025, 0.0125, 0.00625])
 dt = 0.0001
 
@@ -134,4 +138,30 @@ Smax = 30.0  # Example Smax
 Tmax = 5
 order = 2   # Example order of accuracy
 
-convergence_da_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, False, "test")
+# convergence_da_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, False, "test")
+
+testing_folder = "mortality"
+function_folder = "constant_mortality"
+
+if isinstance(dt, np.ndarray):
+    convergence_folder = 'varied_dt'
+
+else:
+    convergence_folder = 'fixed_dt'
+
+
+folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + convergence_folder
+
+Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Smax, Tmax, da, dt, order, 0.5, 0, True, False, folder)
+    # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Tmax, da, dt, order, folder)
+
+
+## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
+# Checks conservation, returns norm and order of conservation
+# Norm1, L1norm = conservation_plt(Ntest, da, m, Amax, Tmax, dt, order, folder, constant, hill_func)   # only works for constant 
+Norm1, L1norm = conservation_plt(da, 0.5, Smax, Tmax, dt, 2, folder, True, False)
+
+
+## PRINT NORMS --------------------------------------------------------------------------------------------
+# print latex table
+tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder)

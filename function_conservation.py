@@ -22,31 +22,31 @@ from function_trapezoidal_rule import trapezoidal_rule
 #     return result
 
 
-def total_pop_time(Tmax, dt, ds):
+# def total_pop_time(Tmax, dt, ds):
         
-    for i in range(5):
-        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
-        time = np.arange(0, Tmax + dt, dt) 
-        n = len(time)
+#     for i in range(5):
+#         data = np.loadtxt('da_convergence/num_' + str(i) + '.txt') # Load in relevant data.
+#         time = np.arange(0, Tmax + dt, dt) 
+#         n = len(time)
 
-        totalPop_num = np.zeros(n)
+#         totalPop_num = np.zeros(n)
 
-        for ii in range(n):
+#         for ii in range(n):
 
-            totalPop_num[ii] = trapezoidal_rule( data[ii,:],     ds[i])
-            print('Numerical total pop  = ' + str(totalPop_num[ii]))
+#             totalPop_num[ii] = trapezoidal_rule( data[ii,:],     ds[i])
+#             print('Numerical total pop  = ' + str(totalPop_num[ii]))
 
-        # time = np.arange(0, Tmax + dt, dt) 
-        print('for data' + str(i) )
-        plt.plot(time, totalPop_num)
-        plt.ylabel('Total Pop')
-        plt.xlabel('time')
-        plt.show()
+#         # time = np.arange(0, Tmax + dt, dt) 
+#         print('for data' + str(i) )
+#         plt.plot(time, totalPop_num)
+#         plt.ylabel('Total Pop')
+#         plt.xlabel('time')
+#         plt.show()
         
 
 
 
-def conservation_plt(Ntest, ds, c, Smax, Tmax, dt, order, folder, constant, hill_func):
+def conservation_plt(ds, c, Smax, Tmax, dt, order, folder, constant, hill_func):
     """Performs trapezoidal rule
     
     Args:
@@ -87,7 +87,12 @@ def conservation_plt(Ntest, ds, c, Smax, Tmax, dt, order, folder, constant, hill
             #     sol = np.exp(-(age - ( Tmax + 5))**2) * np.exp(- m * (age )* Tmax + 0.5 * m * (Tmax)**2)     # with advection -- NON CONSTANT
 
 
-        data = np.loadtxt('da_convergence/num_' + str(i) + '.txt')      # Load in relevant data.
+        # data = np.loadtxt('da_convergence/num_' + str(i) + '.txt')      # Load in relevant data.
+                # Load in relevant data for both mesh sizes
+        if isinstance(dt, np.ndarray):
+            data = np.loadtxt(f'{folder}/solutions/num_{i}.txt') 
+        else:
+            data = np.loadtxt(f'{folder}/solutions/dt_{dt}/num_{i}.txt') 
 
         # Calculate the total population 
         totalPop_sol = trapezoidal_rule( sol,            ds[i])      # solution for different ds
@@ -111,7 +116,7 @@ def conservation_plt(Ntest, ds, c, Smax, Tmax, dt, order, folder, constant, hill
                 print(f"Warning: NaN error value at index {i} or {i-1}.")
 
             # Calculate the order of convergence for norm
-            L1norm[i-1]   = np.log(Norm1[i-1]   / Norm1[i])   / np.log(ds[i-1] / ds[i])
+            L1norm[i]   = np.log(Norm1[i-1]   / Norm1[i])   / np.log(ds[i-1] / ds[i])
 
 
     for i in range(0, 5):
@@ -126,24 +131,27 @@ def conservation_plt(Ntest, ds, c, Smax, Tmax, dt, order, folder, constant, hill
     # plt.figure(figsize=(8, 6))  # Adjust the width and height as needed
     plt.loglog(ds, Norm1, label='Norm 1')
     plt.loglog(ds, ds**(order), label=f'order-{(order) }')
+
     plt.xlabel(r'$\Delta a$')
-    plt.ylabel('Absolute Error')
-    plt.title('Error of Total Population')
+    plt.ylabel('Norm')
+    plt.title('Total Population Convergence')
     plt.legend()
 
-    # # Convert ds array values to a string
-    # ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
+    # Convert ds array values to a string
+    ds_values_str = '_'.join(map(str, np.round(ds, 3) ))
 
-    # # Save the plot to a file -- labels with da values and dt 
     # if isinstance(dt, np.ndarray):
-    #     dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+    if isinstance(dt, np.ndarray):
+        # plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)
+        dt_values_str = '_'.join(map(str, np.round(dt, 3)))
+        plt.savefig(folder + '/plots/tot_pop_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt_values_str) + '.png', dpi=300)
 
-    #     plt.savefig('da_plot/'+ folder +'/varied_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + dt_values_str + '.png', dpi=300)  
-
-    # else:
-    #     plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu_' + str(c) + '_ds_' + ds_values_str + '_dt_' + str(dt) + '.png', dpi=300)  
-
+    else:
+        # plt.savefig('da_plot/'+ folder +'/fixed_dt/lw-ex_plot_totPop_mu__ds_' + ds_values_str + '.png', dpi=300)  
+        plt.savefig(folder + '/plots/dt_' + str(dt) + '/tot_pop_convergence_for_da_' + str(ds_values_str) + '_dt_' + str(dt) + '.png', dpi=300)
+ 
     plt.show()
+    plt.close()
 
 
     # combine = [Norm1, L1norm]

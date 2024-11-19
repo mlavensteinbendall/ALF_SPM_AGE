@@ -24,7 +24,7 @@ start = timeit.default_timer()
 ## INITIAL CONDITIONS
 Amax = 30       # max age
 # Tmax = 5     # max time
-Tmax = 10
+Tmax = 15
 order = 2       # order of method
 Ntest = 5       # number of cases
 
@@ -38,28 +38,28 @@ hill_func_mortality = False
 linear_slope_func_mortality = False
 
 # Reproduction set up
-k = 2
-constant_reproduction = False
+k = 1
+constant_reproduction = True
 linear_reproduction = False
 gaussian_reproduction = False
-test_reproduction = True
+test_reproduction = False
 
 
 # need to chose da and dt so that the last value in the array are Amax and Tmax
 da = np.zeros([Ntest]) # order smallest to largest
 
 # # vary da and dt cases:
-da[0] = 0.1
-da[1] = 0.05
-da[2] = 0.025
-da[3] = 0.0125
-da[4] = 0.00625
+# da[0] = 0.1
+# da[1] = 0.05
+# da[2] = 0.025
+# da[3] = 0.0125
+# da[4] = 0.00625
 
-# da[0] = 0.01
-# da[1] = 0.005
-# da[2] = 0.0025
-# da[3] = 0.00125
-# da[4] = 0.000625
+da[0] = 0.01
+da[1] = 0.005
+da[2] = 0.0025
+da[3] = 0.00125
+da[4] = 0.000625
 
 
 dt = np.zeros([Ntest]) # order smallest to largest
@@ -70,10 +70,11 @@ dt = np.zeros([Ntest]) # order smallest to largest
 # dt[3] = 0.5 * 0.0125
 # dt[4] = 0.5 * 0.00625
 
+# dt = da
 dt = 0.5 * da
 # dt = 0.01
 # dt = 0.001
-# dt = 0.0001
+# dt = 0.001
 
 
 # testing_folder = 'mortality'
@@ -197,7 +198,6 @@ for i in range(len(da)):
         # Plot the mortality function
         plt_mortality_func(age, mu, dt, folder)
 
-
         # Plot the reproduction function
         plt_reproduction_func(age, k, type_k, dt, folder)
 
@@ -239,10 +239,10 @@ for i in range(len(da)):
 ## CONVERGENCE ------------------------------------------------------------------------------------------
 # Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
 if isinstance(dt, np.ndarray):
-    # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant, folder) 
+    # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, folder) 
     Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Tmax, da, dt, order, folder)
 else:
-    # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, m, b, constant, folder)
+    # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, False, folder)
     Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Tmax, da, dt, order, folder)
 
 
