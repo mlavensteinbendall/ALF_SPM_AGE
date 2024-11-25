@@ -24,29 +24,29 @@ start = timeit.default_timer()
 ## INITIAL CONDITIONS
 Amax = 30       # max age
 # Tmax = 5     # max time
-Tmax = 15
+Tmax = 2
 order = 2       # order of method
 Ntest = 5       # number of cases
 
 
 # Mortality set up
-m = 0 #1/30            # constant for mux
+m = 0.5 # 1/30            # constant for mux
 b = 0              # y-intercept
 constant_mortality = True   # True for constant mu, False for function mu
-analytical_sol = False
+analytical_sol = True
 hill_func_mortality = False
 linear_slope_func_mortality = False
 
 # Reproduction set up
 k = 1
-constant_reproduction = True
+constant_reproduction = False
 linear_reproduction = False
 gaussian_reproduction = False
 test_reproduction = False
 
 
 # need to chose da and dt so that the last value in the array are Amax and Tmax
-da = np.zeros([Ntest]) # order smallest to largest
+# da = np.zeros([Ntest]) # order smallest to largest
 
 # # vary da and dt cases:
 # da[0] = 0.1
@@ -55,11 +55,15 @@ da = np.zeros([Ntest]) # order smallest to largest
 # da[3] = 0.0125
 # da[4] = 0.00625
 
-da[0] = 0.01
-da[1] = 0.005
-da[2] = 0.0025
-da[3] = 0.00125
-da[4] = 0.000625
+# da[0] = 0.01
+# da[1] = 0.005
+# da[2] = 0.0025
+# da[3] = 0.00125
+# da[4] = 0.000625
+
+da = np.zeros([1])
+da[0] = 2
+dt = 1
 
 
 dt = np.zeros([Ntest]) # order smallest to largest
@@ -71,14 +75,14 @@ dt = np.zeros([Ntest]) # order smallest to largest
 # dt[4] = 0.5 * 0.00625
 
 # dt = da
-dt = 0.5 * da
+# dt = 0.5 * da
 # dt = 0.01
 # dt = 0.001
 # dt = 0.001
 
 
-# testing_folder = 'mortality'
-testing_folder = 'reproduction'
+testing_folder = 'mortality'
+# testing_folder = 'reproduction'
 
 if constant_mortality == True:
     if m == 0 :
@@ -136,7 +140,7 @@ folder = 'convergence/' + testing_folder + '/' + function_folder + '/' + converg
 # Using the given da and dt values, this loop calculates the numerical solution, solve the analytical 
 # solution, and plots the numerical vs. analytical solution. 
 # BEGIN LOOP ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-for i in range(len(da)):
+for i in range(0):
 
     print('Entering loop ' + str(i))                # progress update, loop began
 
@@ -238,23 +242,23 @@ for i in range(len(da)):
 
 ## CONVERGENCE ------------------------------------------------------------------------------------------
 # Calculate and plot the convergence, returns an matrix with Norm2, L2norm, NormMax, and LMaxnorm
-if isinstance(dt, np.ndarray):
-    # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, folder) 
-    Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Tmax, da, dt, order, folder)
-else:
-    # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, False, folder)
-    Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Tmax, da, dt, order, folder)
+# if isinstance(dt, np.ndarray):
+#     # Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, folder) 
+#     Norm2, L2norm, NormMax, LMaxnorm = convergence_dt_plt(Tmax, da, dt, order, folder)
+# else:
+#     # Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Amax, Tmax, da, dt, order, m, b, constant_mortality, False, folder)
+#     Norm2, L2norm, NormMax, LMaxnorm = convergence_da_plt(Tmax, da, dt, order, folder)
 
 
-## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
-# Checks conservation, returns norm and order of conservation
-# Norm1, L1norm = conservation_plt(Ntest, da, m, Amax, Tmax, dt, order, folder, constant, hill_func)   # only works for constant 
-Norm1, L1norm = conservation_plt(da, dt, order, folder)
+# ## TOTAL POPULATION ERROR --------------------------------------------------------------------------------
+# # Checks conservation, returns norm and order of conservation
+# # Norm1, L1norm = conservation_plt(Ntest, da, m, Amax, Tmax, dt, order, folder, constant, hill_func)   # only works for constant 
+# Norm1, L1norm = conservation_plt(da, dt, order, folder)
 
 
-## PRINT NORMS --------------------------------------------------------------------------------------------
-# print latex table
-tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder)
+# ## PRINT NORMS --------------------------------------------------------------------------------------------
+# # print latex table
+# tabulate_conv(dt, da, Norm2, L2norm, NormMax, LMaxnorm, Norm1, L1norm, folder)
 
 # # print excel compatible table
 # if isinstance(dt, np.ndarray):
