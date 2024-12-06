@@ -1,52 +1,48 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def mortality(age_max, age, m, b, constant):
-    """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
+
+def mortality(age, par):
+    return np.full(len(age), par)
+
+
+
+
+
+# def mortality(age_max, age, m, b, constant, linear_function, hill_function):
+#     """Calculates the numerical solution using strang splitting, lax-wendroff, and runge-kutta method. 
     
-    Args:
-        age     (array): A list of all the ages
-        m       (int):   A constant for the slope
-        b       (int):   y-intercept
-        constant(bool):  Check whether a constant mortality is wanted or not
+#     Args:
+#         age     (array): A list of all the ages
+#         m       (int):   A constant for the slope
+#         b       (int):   y-intercept
+#         constant(bool):  Check whether a constant mortality is wanted or not
         
-    Returns:
-        mu       (array): Represents mortality rate at each age
-    """
-    if constant:
-        # Apply constant mortality rate
-        mu = np.full(len(age), m)  # Fill array with constant value of m (assuming m in [0,1])
+#     Returns:
+#         mu       (array): Represents mortality rate at each age
+#     """
+#     if constant == True:
+#         # Apply constant mortality rate
+#         mu = np.full(len(age), m)  # Fill array with constant value of m (assuming m in [0,1])
 
-    else:
-        # Apply mortality based on the linear equation: y = m * (age / age_max) + b
-        # mu = m *(1 - np.cos(age/age_max * np.pi))
-        mu = m * age + b
+#     else:
+#         if linear_function == True:
+#             mu = m * age + b                                # linear function
 
-        # mu = 1 + age * (20**2 / (20**2 + age**2))
-        # mu = age/10 * (20**2 / (20**2 + age**2))
+#         elif hill_function == True:
+#             mu = (age / 15) * (30**2 / (30**2 + age**2))    # hill function
 
-        # mu = 0.1 + 0.9 * np.exp(- 1000000000 * np.exp(- 1 * age))
+#         else:
+#             mu = np.exp(-6 * np.exp(-0.15 * age ))
+ 
+#         # Apply mortality based on the linear equation: y = m * (age / age_max) + b
+#         # mu = 0.5 *(1 - np.cos(age/age_max * np.pi))
 
-        # mu = m * (age/age_max) + b
-        # mu = m * (age)/ (age+10000) + b
-        # mu = m * (age)/ (age+1000) + b
-        # mu =  np.exp( - age )
+#         # c1 = -1
+#         # c2 = 10
 
-        # mu = np.log(age+1)
+#         # mu = 1 + c1 * (c2**2/(c2**2 + age**2))
 
-
-    # # clear figures 
-    # plt.clf()
-
-    # # Plot.
-    # plt.plot(age, mu)
-
-    # plt.xlabel('Age')
-    # plt.ylabel('Mortality Rate')
-    # plt.title('Mortality Rate based on Age')
-    # plt.legend()
-    # plt.show()
-
-    return mu
+#     return mu
 
 
